@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['type', 'appearance_date'])]
+#[Fillable(['name', 'type', 'appearance_date'])]
 class Client extends Model
 {
     /**
