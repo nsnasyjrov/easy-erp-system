@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function ()
         {
-            Route::prefix('companies')->group(__DIR__ . '/../routes/companies/companies_route.php');
+            Route::prefix('companies')->group(__DIR__ . '/../routes/companies/companies.php');
             Route::prefix('clients')->group(__DIR__ . '/../routes/clients/clients.php');
         }
     )

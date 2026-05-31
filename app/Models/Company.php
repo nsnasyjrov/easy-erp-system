@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['name', 'legal_name', 'legal_address',
-            'registration_country', 'tin_number'])]
+#[Fillable(['name', 'legal_name', 'legal_address', 'chief_manager',
+            'registration_country', 'tin_number', 'client_id'])]
 class Company extends Model
 {
 

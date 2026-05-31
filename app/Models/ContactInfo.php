@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['type', 'value'])]
+#[Fillable(['client_id', 'type', 'value'])]
 class ContactInfo extends Model
 {
 

@@ -29,6 +29,8 @@ class StoreCompanyRequest extends FormRequest
             'legal_address' => ['nullable', 'string', 'max:255'],
             'registration_country' => ['nullable', 'string', 'max:255'],
             'tin_number' => ['required', 'string', 'max:255'],
+            'client_id' => ['nullable', 'integer'],
+            'chief_manager' => ['nullable', 'integer'],
 
             'contact_type' => ['nullable', 'string', 'max:255'],
             'contact_value' => ['nullable', 'string', 'max:255'],
