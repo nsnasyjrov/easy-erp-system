@@ -3,20 +3,26 @@
 namespace App\Http\Controllers\Clients;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Client\DestroyClientRequest;
 use App\Http\Requests\Client\StoreClientRequest;
+use App\Http\Requests\Client\UpdateClientRequest;
 use App\Services\Client\ClientService;
-use \Illuminate\Http\JsonResponse;
+use Illuminate\Http\JsonResponse;
 
 
 class ClientController extends Controller
 {
 
-    public function store(StoreClientRequest $request, ClientService $service): JsonResponse
+    public function __construct(
+        private ClientService $service
+    ) {}
+
+    public function store(StoreClientRequest $request): JsonResponse
     {
         try{
 
             $validatedData = $request->validated();
-            $result = $service->create($validatedData);
+            $result = $this->service->create($validatedData);
 
             return response()->json($result, 201);
 
@@ -26,5 +32,44 @@ class ClientController extends Controller
         }
     }
 
+    public function update(UpdateClientRequest $request): JsonResponse
+    {
 
+        try {
+            $validatedData = $request->validated();
+            $fields = array_diff(array_keys($validatedData), ['id']);
+
+            if (empty($fields)) {
+                return response()->json(['message' => 'Нет полей для обновления'], 422);
+            }
+
+            $result = $this->service->update($validatedData);
+
+            return response()->json($result);
+
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 500);
+        }
+    }
+
+    public function destroy(DestroyClientRequest $request): JsonResponse
+    {
+
+        try {
+
+            $validatedData = $request->validated();
+
+            $result = $this->service->delete($validatedData);
+
+            if (empty($result)) {
+                return response()->json(['message' => 'Client not found'], 404);
+            }
+
+            return response()->json($result, 204);
+
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 500);
+        }
+
+    }
 }
