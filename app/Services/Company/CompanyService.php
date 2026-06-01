@@ -54,7 +54,11 @@ class CompanyService
     {
         try {
 
-            $company = Client::find($companyData['id']);
+            $company = Company::find($companyData['id']);
+
+            if (empty($company)) {
+                throw new \Exception('Company not found');
+            }
 
             $company->update($companyData);
 

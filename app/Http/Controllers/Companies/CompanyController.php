@@ -49,6 +49,8 @@ class CompanyController extends Controller
 
             $result = $this->service->update($validatedData);
 
+            return response()->json($result);
+
         } catch (\Exception $exception) {
             return response()->json($exception->getMessage(), 500);
         }
