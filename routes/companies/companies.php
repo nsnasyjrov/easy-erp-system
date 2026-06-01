@@ -10,11 +10,11 @@ Route::get('/', function () {
     echo '<br>Companies:';
 });
 
-// Create client entity
+// Create company entity
 Route::post('store_company', [CompanyController::class, 'store']);
 
-// Update client entity
-//Route::put('update_client', [ClientController::class, 'update']);
+//Update company entity
+Route::put('update_client', [CompanyController::class, 'update']);
 //
 //// Delete client entity
 //Route::post('delete_client', [ClientController::class, 'destroy']);

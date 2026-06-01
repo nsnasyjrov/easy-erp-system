@@ -50,15 +50,15 @@ class CompanyService
     /**
      * @throws \Exception
      */
-    public function update(array $clientData): Client
+    public function update(array $companyData): Company
     {
         try {
 
-            $client = Client::find($clientData['id']);
+            $company = Client::find($companyData['id']);
 
-            $client->update($clientData);
+            $company->update($companyData);
 
-            return $client->refresh();
+            return $company->refresh();
 
         } catch (QueryException $e) {
             throw new \Exception('Query error: ' . $e->getMessage());

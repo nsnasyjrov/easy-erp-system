@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Http\Requests\Company;
+
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateCompanyRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return True;
+        // return auth->check();
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'id' => ['required', 'integer'],
+            'name' => ['nullable', 'string'],
+            'legal_address' => ['nullable', 'string'],
+            'registration_country' => ['nullable', 'string'],
+            'chief_manager' => ['nullable', 'integer'],
+            'tin_number' => ['nullable', 'string'],
+            'client_id' => ['nullable', 'string']
+        ];
+    }
+}
