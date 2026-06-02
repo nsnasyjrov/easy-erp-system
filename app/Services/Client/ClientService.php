@@ -7,6 +7,38 @@ use Illuminate\Database\QueryException;
 
 class ClientService
 {
+
+    /**
+     * @throws \Exception
+     */
+    public function index()
+    {
+
+        try {
+
+            $clients = Client::all();
+
+            return $clients;
+        } catch (QueryException $e) {
+            throw new \Exception($e->getMessage());
+        }
+
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function show($id)
+    {
+        try {
+
+            return Client::find($id);
+
+        } catch (QueryException $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
+
     /**
      * @throws \Exception
      */

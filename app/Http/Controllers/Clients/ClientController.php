@@ -17,6 +17,33 @@ class ClientController extends Controller
         private ClientService $service
     ) {}
 
+
+    public function index()
+    {
+        try {
+            $clients = $this->service->index();
+
+            return response()->json($clients);
+
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 500);
+        }
+    }
+
+    public function show(int $client_id)
+    {
+        try {
+
+            $client = $this->service->show($client_id);
+
+            return response()->json($client);
+
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 500);
+        }
+    }
+
+
     public function store(StoreClientRequest $request): JsonResponse
     {
         try{
