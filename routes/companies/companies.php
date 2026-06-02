@@ -15,6 +15,6 @@ Route::post('store_company', [CompanyController::class, 'store']);
 
 //Update company entity
 Route::put('update_company', [CompanyController::class, 'update']);
-//
-//// Delete client entity
-//Route::post('delete_client', [ClientController::class, 'destroy']);
+
+//Become to Client
+Route::post('{company_id}/client', [CompanyController::class, 'storeClient']);

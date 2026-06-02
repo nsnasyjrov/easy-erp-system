@@ -93,4 +93,53 @@ class CompanyService
 
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function storeClientFromCompany($company_id, $clientData)
+    {
+
+        try {
+
+            $client = DB::transaction(function () use ($company_id, $clientData) {
+
+                $company = Company::find($company_id);
+
+                if (!empty($company->client_id)) {
+                    throw new \Exception('Client from company already exists');
+                }
+
+                if (empty($company)) throw new \Exception('Company not found');
+
+                // create Client entity
+
+                $client = Client::create([
+                    'type' => "company",
+                    'name' => $company->name,
+                    'appearance_date' => $clientData['appearance_date']
+                ]);
+
+                $company->client()->associate($client);
+                $company->save();
+
+                foreach ($clientData['contacts'] ?? [] as $contact) {
+
+                    $client->contacts()->create([
+                        'type' => $contact['type'],
+                        'value' => $contact['value'],
+                    ]);
+                }
+
+                return $client;
+            });
+
+            return $client;
+
+        } catch (QueryException $e) {
+            throw new \Exception('Query error: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
+
 }
