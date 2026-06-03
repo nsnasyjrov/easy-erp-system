@@ -2,7 +2,9 @@
 
 namespace App\Services\Client;
 
+use App\Enums\ContactInfoType;
 use App\Models\Client;
+use App\Models\ContactInfo;
 use Illuminate\Database\QueryException;
 
 class ClientService
@@ -28,7 +30,7 @@ class ClientService
     /**
      * @throws \Exception
      */
-    public function show($id)
+    public function show($id): Client
     {
         try {
 
@@ -96,4 +98,44 @@ class ClientService
 
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function ensureClientContacts($contactData, $clientId): ContactInfo|array
+    {
+        $client = Client::find($clientId);
+
+        if (empty($client)) {
+            throw new \Exception('Client not found');
+        }
+
+        try {
+
+            $contact = ContactInfo::make($contactData);
+
+            $client->contacts()->save($contact);
+
+            return $contact;
+        } catch (QueryException $e) {
+            throw new \Exception('Query error: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
+    }
+
+    public function getClientContacts(int $client_id)
+    {
+
+        try {
+
+            $contacts = ContactInfo::where('client_id', $client_id)->get();
+
+            return $contacts;
+
+        } catch(\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
+    }
 }

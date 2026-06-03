@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Clients;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\DestroyClientRequest;
+use App\Http\Requests\Client\EnsureClientContactsRequest;
 use App\Http\Requests\Client\StoreClientRequest;
 use App\Http\Requests\Client\UpdateClientRequest;
 use App\Services\Client\ClientService;
 use Illuminate\Http\JsonResponse;
+use mysql_xdevapi\Exception;
 
 
 class ClientController extends Controller
@@ -16,7 +18,6 @@ class ClientController extends Controller
     public function __construct(
         private ClientService $service
     ) {}
-
 
     public function index()
     {
@@ -46,7 +47,7 @@ class ClientController extends Controller
 
     public function store(StoreClientRequest $request): JsonResponse
     {
-        try{
+        try {
 
             $validatedData = $request->validated();
             $result = $this->service->create($validatedData);
@@ -99,4 +100,33 @@ class ClientController extends Controller
         }
 
     }
+
+    public function ensureClientContacts(EnsureClientContactsRequest $request, int $client_id): JsonResponse
+    {
+        $contactsCreated = false;
+
+        try {
+
+            $validatedData = $request->validated();
+
+            if (empty($validatedData)) {
+
+                $result = $this->service->getClientContacts($client_id);
+
+            } else {
+
+                $result = $this->service->ensureClientContacts($validatedData, $client_id);
+                $contactsCreated = true;
+            }
+
+            $status = ($contactsCreated = true) ? 201 : 200;
+
+            return response()->json($result, $status);
+
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 500);
+        }
+
+    }
+
 }

@@ -43,6 +43,4 @@ class Client extends Model
             'appearance_date' => 'date'
         ];
     }
-
-
 }
