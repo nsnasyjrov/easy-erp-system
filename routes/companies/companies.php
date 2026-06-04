@@ -3,21 +3,24 @@
 use App\Http\Controllers\Companies\CompanyController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    /**
-     * TODO: В дальнейшем команда должна вернуть список компаний, доступных пользователю, в зависимости от уровня досутпа
-     */
-    echo '<br>Companies:';
-});
+Route::prefix('companies')->group(function () {
+
+//Base GET companies route
+    Route::get('/', [CompanyController::class, 'index']);
+
+    Route::get('/{company}', [CompanyController::class, 'show']);
 
 // Create company entity
-Route::post('store_company', [CompanyController::class, 'store']);
+    Route::post('/', [CompanyController::class, 'store']);
 
 //Update company entity
-Route::put('update_company', [CompanyController::class, 'update']);
+    Route::patch('{company}', [CompanyController::class, 'update']);
 
 // Get client
-Route::get('{company_id}/client', [CompanyController::class, 'client']);
+    Route::get('{company_id}/client', [CompanyController::class, 'client']);
 
 //Ensure client
-Route::post('{company_id}/client', [CompanyController::class, 'storeClient']);
+    Route::post('{company_id}/client', [CompanyController::class, 'storeClient']);
+});
+
+

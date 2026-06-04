@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Companies;
 use App\Http\Requests\Company\StoreClientFromCompanyRequest;
 use App\Http\Requests\Company\StoreCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
+use App\Models\Company;
 use App\Services\Company\CompanyService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +17,12 @@ class CompanyController extends Controller
     public function __construct(
         private CompanyService $service
     ) {}
+
+    public function show(Company $company): JsonResponse
+    {
+        return response()->json($company);
+
+    }
 
 
     public function store(StoreCompanyRequest $request): JsonResponse
@@ -35,19 +42,18 @@ class CompanyController extends Controller
 
     }
 
-    public function update(UpdateCompanyRequest $request)
+    public function update(UpdateCompanyRequest $request, Company $company): JsonResponse
     {
 
         try {
 
             $validatedData = $request->validated();
-            $fields = array_diff(array_keys($validatedData), ['id']);
 
-            if (empty($fields)) {
-                return response()->json(['message' => 'Нет полей для обновления'], 422);
+            if (empty($validatedData)) {
+                return response()->json('No fields to update', 422);
             }
 
-            $result = $this->service->update($validatedData);
+            $result = $this->service->update($company, $validatedData);
 
             return response()->json($result);
         } catch (\Exception $exception) {

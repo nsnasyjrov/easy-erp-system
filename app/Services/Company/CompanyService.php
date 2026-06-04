@@ -50,25 +50,11 @@ class CompanyService
     /**
      * @throws \Exception
      */
-    public function update(array $companyData): Company
+    public function update(Company $company, array $companyData): Company
     {
-        try {
-
-            $company = Company::find($companyData['id']);
-
-            if (empty($company)) {
-                throw new \Exception('Company not found');
-            }
-
             $company->update($companyData);
 
             return $company->refresh();
-
-        } catch (QueryException $e) {
-            throw new \Exception('Query error: ' . $e->getMessage());
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
     }
 
     /**
