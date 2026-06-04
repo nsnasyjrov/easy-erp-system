@@ -16,5 +16,8 @@ Route::post('store_company', [CompanyController::class, 'store']);
 //Update company entity
 Route::put('update_company', [CompanyController::class, 'update']);
 
-//Become to Client
+// Get client
+Route::get('{company_id}/client', [CompanyController::class, 'client']);
+
+//Ensure client
 Route::post('{company_id}/client', [CompanyController::class, 'storeClient']);

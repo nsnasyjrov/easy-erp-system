@@ -142,4 +142,24 @@ class CompanyService
         }
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function getClient($company_id) {
+
+        try {
+
+            $company = Company::find($company_id);
+
+            if (empty($company)) throw new \Exception('Company not found');
+
+            return $company->client;
+
+        } catch (QueryException $e) {
+            throw new \Exception('Query error: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
+
 }

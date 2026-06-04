@@ -72,6 +72,21 @@ class CompanyController extends Controller
 
     }
 
+    public function client($company_id): JsonResponse
+    {
+
+        try {
+
+            $contacts = $this->service->getClient($company_id);
+
+            return response()->json($contacts);
+
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 500);
+        }
+
+    }
+
 
 
 }

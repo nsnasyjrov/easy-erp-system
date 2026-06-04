@@ -19,7 +19,7 @@ Route::put('update_client', [ClientController::class, 'update']);
 // Delete client entity
 Route::post('delete_client', [ClientController::class, 'destroy']);
 
-
+//Get contacts
 Route::get('{client_id}/contacts', [ClientController::class, 'contacts']);
 // Add contact data
 Route::post("{client_id}/contacts", [ClientController::class, 'ensureClientContacts']);
