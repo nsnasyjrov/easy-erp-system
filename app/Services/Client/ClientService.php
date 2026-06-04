@@ -101,7 +101,7 @@ class ClientService
     /**
      * @throws \Exception
      */
-    public function ensureClientContacts($contactData, $clientId): ContactInfo|array
+    public function ensureClientContacts($contactData, $clientId): ContactInfo
     {
         $client = Client::find($clientId);
 

@@ -103,25 +103,29 @@ class ClientController extends Controller
 
     public function ensureClientContacts(EnsureClientContactsRequest $request, int $client_id): JsonResponse
     {
-        $contactsCreated = false;
 
         try {
 
             $validatedData = $request->validated();
 
-            if (empty($validatedData)) {
+            $result = $this->service->ensureClientContacts($validatedData, $client_id);
 
-                $result = $this->service->getClientContacts($client_id);
+            return response()->json($result, 201);
 
-            } else {
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage(), 500);
+        }
 
-                $result = $this->service->ensureClientContacts($validatedData, $client_id);
-                $contactsCreated = true;
-            }
+    }
 
-            $status = ($contactsCreated = true) ? 201 : 200;
+    public function contacts($client_id): JsonResponse
+    {
 
-            return response()->json($result, $status);
+        try {
+
+            $contacts = $this->service->getClientContacts($client_id);
+
+            return response()->json($contacts);
 
         } catch (\Exception $exception) {
             return response()->json($exception->getMessage(), 500);

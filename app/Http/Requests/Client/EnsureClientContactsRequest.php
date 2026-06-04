@@ -25,8 +25,8 @@ class EnsureClientContactsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type'=> ['nullable', Rule::enum(ContactInfoType::class)],
-            'value'=> ['nullable', 'string']
+            'type'=> ['required', Rule::enum(ContactInfoType::class)],
+            'value'=> ['required', 'string']
         ];
     }
 }
