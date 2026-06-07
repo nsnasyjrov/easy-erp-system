@@ -12,19 +12,19 @@ Route::prefix('companies')->group(function () {
     Route::post('/', [CompanyController::class, 'store']);
 
     // Read company entity
-    Route::get('/{company}', [CompanyController::class, 'show']);
+    Route::get('/{company}', [CompanyController::class, 'show'])->whereNumber('company');
 
     //Update company entity
-    Route::patch('{company}', [CompanyController::class, 'update']);
+    Route::patch('{company}', [CompanyController::class, 'update'])->whereNumber('company');
 
     // Delete
-    Route::delete('{company}', [CompanyController::class, 'destroy']);
+    Route::delete('{company}', [CompanyController::class, 'destroy'])->whereNumber('company');
 
     // Get client
-    Route::get('{company}/client', [CompanyController::class, 'client']);
+    Route::get('{company}/client', [CompanyController::class, 'client'])->whereNumber('company');
 
     //Ensure client
-    Route::post('{company}/client', [CompanyController::class, 'storeClient']);
+    Route::post('{company}/client', [CompanyController::class, 'storeClient'])->whereNumber('company');
 });
 
 

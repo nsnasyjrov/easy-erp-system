@@ -2,11 +2,9 @@
 
 namespace App\Services\Company;
 
-use App\Exception\Domain\CompanyAlreadyLinkedToClientException;
+use App\Enums\ClientType;
 use App\Models\Client;
 use App\Models\Company;
-use App\Models\ContactInfo;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 
 class CompanyService
@@ -16,27 +14,7 @@ class CompanyService
      */
     public function create(array $companyData): Company
     {
-            $result = DB::transaction(function () use ($companyData) {
-
-                $company = Company::create($companyData);
-
-                // Check: if in data exist contacts => insert into client_contacts table
-                if (!empty($clientData['contact_type']) and !empty($clientData['contact_value'])) {
-
-                    $contact = new ContactInfo([
-                        'type' => $companyData['contact_type'],
-                        'value' => $companyData['contact_value']
-                    ]);
-
-                    $contact->client()->associate($company);
-                    $contact->save();
-
-                }
-
-                return $company;
-            });
-
-            return $result;
+            return Company::create($companyData);
     }
 
     /**
@@ -52,37 +30,19 @@ class CompanyService
     /**
      * @throws \Exception
      */
-    public function delete(array $clientData): bool
-    {
-
-
-
-
-            $client = Client::find($clientData['id']);
-
-            if (empty($client)) return false;
-
-            return $client->delete();
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function storeClientFromCompany(Company $company, $clientData)
+    public function storeClientFromCompany(Company $company, array $clientData): Client
     {
 
         if ($company->client_id != null) {
-             abort(409,"Company already linked to a client");
+             abort(409,'Company already linked to a client');
         }
-
 
             $client = DB::transaction(function () use ($company, $clientData) {
 
 
                 // create Client entity
-
                 $client = Client::create([
-                    'type' => "company",
+                    'type' => ClientType::Company->value,
                     'name' => $company->name,
                     'appearance_date' => $clientData['appearance_date']
                 ]);
@@ -101,7 +61,7 @@ class CompanyService
                 return $client;
             });
 
-            return $client;
+            return $client->load('contacts');
     }
 
 }

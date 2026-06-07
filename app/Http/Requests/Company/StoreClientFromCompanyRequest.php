@@ -25,7 +25,7 @@ class StoreClientFromCompanyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'appearance_date' => ['required', 'date'],
+            'appearance_date' => ['required', 'date '],
 
             'contacts' => ['required', 'array'],
             'contacts.*.type' => ['required', Rule::enum(ContactInfoType::class)],
