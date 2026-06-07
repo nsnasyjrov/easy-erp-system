@@ -5,22 +5,26 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('companies')->group(function () {
 
-//Base GET companies route
+    //Base GET companies route
     Route::get('/', [CompanyController::class, 'index']);
 
-    Route::get('/{company}', [CompanyController::class, 'show']);
-
-// Create company entity
+    // Create company entity
     Route::post('/', [CompanyController::class, 'store']);
 
-//Update company entity
+    // Read company entity
+    Route::get('/{company}', [CompanyController::class, 'show']);
+
+    //Update company entity
     Route::patch('{company}', [CompanyController::class, 'update']);
 
-// Get client
-    Route::get('{company_id}/client', [CompanyController::class, 'client']);
+    // Delete
+    Route::delete('{company}', [CompanyController::class, 'destroy']);
 
-//Ensure client
-    Route::post('{company_id}/client', [CompanyController::class, 'storeClient']);
+    // Get client
+    Route::get('{company}/client', [CompanyController::class, 'client']);
+
+    //Ensure client
+    Route::post('{company}/client', [CompanyController::class, 'storeClient']);
 });
 
 

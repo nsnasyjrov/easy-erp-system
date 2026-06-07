@@ -2,6 +2,7 @@
 
 namespace App\Services\Company;
 
+use App\Exception\Domain\CompanyAlreadyLinkedToClientException;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\ContactInfo;
@@ -15,8 +16,6 @@ class CompanyService
      */
     public function create(array $companyData): Company
     {
-        try {
-
             $result = DB::transaction(function () use ($companyData) {
 
                 $company = Company::create($companyData);
@@ -38,13 +37,6 @@ class CompanyService
             });
 
             return $result;
-
-        } catch (QueryException $e) {
-            throw new \Exception('Query error: ' . $e->getMessage());
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
-
     }
 
     /**
@@ -63,39 +55,29 @@ class CompanyService
     public function delete(array $clientData): bool
     {
 
-        try {
+
+
 
             $client = Client::find($clientData['id']);
 
             if (empty($client)) return false;
 
             return $client->delete();
-
-        } catch (QueryException $e) {
-            throw new \Exception('Query error: ' . $e->getMessage());
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
-
     }
 
     /**
      * @throws \Exception
      */
-    public function storeClientFromCompany($company_id, $clientData)
+    public function storeClientFromCompany(Company $company, $clientData)
     {
 
-        try {
+        if ($company->client_id != null) {
+             abort(409,"Company already linked to a client");
+        }
 
-            $client = DB::transaction(function () use ($company_id, $clientData) {
 
-                $company = Company::find($company_id);
+            $client = DB::transaction(function () use ($company, $clientData) {
 
-                if (!empty($company->client_id)) {
-                    throw new \Exception('Client from company already exists');
-                }
-
-                if (empty($company)) throw new \Exception('Company not found');
 
                 // create Client entity
 
@@ -120,32 +102,6 @@ class CompanyService
             });
 
             return $client;
-
-        } catch (QueryException $e) {
-            throw new \Exception('Query error: ' . $e->getMessage());
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function getClient($company_id) {
-
-        try {
-
-            $company = Company::find($company_id);
-
-            if (empty($company)) throw new \Exception('Company not found');
-
-            return $company->client;
-
-        } catch (QueryException $e) {
-            throw new \Exception('Query error: ' . $e->getMessage());
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
     }
 
 }

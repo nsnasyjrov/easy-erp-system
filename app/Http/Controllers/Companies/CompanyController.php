@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Companies;
 use App\Http\Requests\Company\StoreClientFromCompanyRequest;
 use App\Http\Requests\Company\StoreCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
+use App\Http\Resources\ClientResource;
+use App\Http\Resources\CompanyResource;
 use App\Models\Company;
 use App\Services\Company\CompanyService;
 use App\Http\Controllers\Controller;
@@ -18,9 +20,18 @@ class CompanyController extends Controller
         private CompanyService $service
     ) {}
 
-    public function show(Company $company): JsonResponse
+    public function index()
     {
-        return response()->json($company);
+
+        $companies = Company::all();
+
+        return CompanyResource::collection($companies);
+    }
+
+    public function show(Company $company): CompanyResource
+    {
+
+        return new CompanyResource($company);
 
     }
 
@@ -28,24 +39,16 @@ class CompanyController extends Controller
     public function store(StoreCompanyRequest $request): JsonResponse
     {
 
-        try {
-
-            $validatedData = $request->validated();
+         $validatedData = $request->validated();
 
             $result = $this->service->create($validatedData);
 
             return response()->json($result, 201);
-
-        } catch (\Exception $exception) {
-            return response()->json($exception->getMessage(), 400);
-        }
-
     }
 
     public function update(UpdateCompanyRequest $request, Company $company): JsonResponse
     {
 
-        try {
 
             $validatedData = $request->validated();
 
@@ -56,40 +59,35 @@ class CompanyController extends Controller
             $result = $this->service->update($company, $validatedData);
 
             return response()->json($result);
-        } catch (\Exception $exception) {
-            return response()->json($exception->getMessage(), 500);
-        }
 
     }
 
-    public function storeClient(StoreClientFromCompanyRequest $request, int $company_id): JsonResponse
+    public function storeClient(StoreClientFromCompanyRequest $request, Company $company): JsonResponse
     {
-        try {
 
             $validatedData = $request->validated();
 
-            $result = $this->service->storeClientFromCompany($company_id, $validatedData);
+            $result = $this->service->storeClientFromCompany($company, $validatedData);
 
             return response()->json($result, 201);
+    }
 
-        } catch (\Exception $exception) {
-            return response()->json($exception->getMessage(), 500);
-        }
+    public function client(Company $company): ClientResource
+    {
+
+         $client = $company->client;
+
+         return new ClientResource($client);
 
     }
 
-    public function client($company_id): JsonResponse
+    public function destroy(Company $company)
     {
+        $result = $company->delete();
 
-        try {
+        if (empty($result)) abort(404, "Company not found");
 
-            $contacts = $this->service->getClient($company_id);
-
-            return response()->json($contacts);
-
-        } catch (\Exception $exception) {
-            return response()->json($exception->getMessage(), 500);
-        }
+        return response()->noContent();
 
     }
 
