@@ -4,25 +4,25 @@ use App\Http\Controllers\Clients\ClientController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('clients')->group(function () {
+
     Route::get('/', [ClientController::class, 'index']);
-    Route::get('index', [ClientController::class, 'index']);
 
 // Create client entity
-    Route::post('register_client', [ClientController::class, 'store']);
+    Route::post('/', [ClientController::class, 'store']);
 
 // Read client entity
-    Route::get('show/{client_id}', [ClientController::class, 'show']);
+    Route::get('{client}', [ClientController::class, 'show'])->whereNumber('client');
 
 // Update client entity
-    Route::put('update_client', [ClientController::class, 'update']);
+    Route::patch('{client}', [ClientController::class, 'update'])->whereNumber('client');
 
 // Delete client entity
-    Route::post('delete_client', [ClientController::class, 'destroy']);
+    Route::delete('{client}', [ClientController::class, 'destroy'])->whereNumber('client');
 
 //Get contacts
-    Route::get('{client_id}/contacts', [ClientController::class, 'contacts']);
+    Route::get('{client}/contacts', [ClientController::class, 'contacts'])->whereNumber('client');
 // Add contact data
-    Route::post("{client_id}/contacts", [ClientController::class, 'ensureClientContacts']);
+    Route::post("{client}/contacts", [ClientController::class, 'ensureClientContacts'])->whereNumber('client');
 
 });
 

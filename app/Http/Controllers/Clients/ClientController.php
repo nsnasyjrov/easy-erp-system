@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Clients;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Client\DestroyClientRequest;
 use App\Http\Requests\Client\EnsureClientContactsRequest;
 use App\Http\Requests\Client\StoreClientRequest;
 use App\Http\Requests\Client\UpdateClientRequest;
+use App\Http\Resources\ClientResource;
+use App\Http\Resources\ContactInfoResource;
+use App\Models\Client;
 use App\Services\Client\ClientService;
 use Illuminate\Http\JsonResponse;
-use mysql_xdevapi\Exception;
-
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 class ClientController extends Controller
 {
@@ -19,118 +21,68 @@ class ClientController extends Controller
         private ClientService $service
     ) {}
 
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
-        try {
-            $clients = $this->service->index();
+        $clients = Client::latest()->paginate(20);
 
-            return response()->json($clients);
-
-        } catch (\Exception $exception) {
-            return response()->json($exception->getMessage(), 500);
-        }
+        return (ClientResource::collection($clients));
     }
 
-    public function show(int $client_id)
+    public function show(Client $client): ClientResource
     {
-        try {
-
-            $client = $this->service->show($client_id);
-
-            return response()->json($client);
-
-        } catch (\Exception $exception) {
-            return response()->json($exception->getMessage(), 500);
-        }
+            return (new  ClientResource($client));
     }
-
 
     public function store(StoreClientRequest $request): JsonResponse
     {
-        try {
 
             $validatedData = $request->validated();
             $result = $this->service->create($validatedData);
 
-            return response()->json($result, 201);
-
-        } catch (\Exception $exception) {
-            // На данном этапе пускай везде код 500 - в будущем нужно обработать другие exception-сценарии.
-            return response()->json($exception->getMessage(), 500);
-        }
+            return (new ClientResource($result))
+                    ->additional(["message" => "Client created"])
+                    ->response()->setStatusCode(201);
     }
 
-    public function update(UpdateClientRequest $request): JsonResponse
+    public function update(UpdateClientRequest $request, Client $client): ClientResource|JsonResponse
     {
 
-        try {
             $validatedData = $request->validated();
-            $fields = array_diff(array_keys($validatedData), ['id']);
 
-            if (empty($fields)) {
+            if (empty($validatedData)) {
                 return response()->json(['message' => 'Нет полей для обновления'], 422);
             }
 
-            $result = $this->service->update($validatedData);
+            $result = $this->service->update( $client, $validatedData);
 
-            return response()->json($result);
-
-        } catch (\Exception $exception) {
-            return response()->json($exception->getMessage(), 500);
-        }
+            return (new ClientResource($result))->additional(["message" => "Client updated"]);
     }
 
-    public function destroy(DestroyClientRequest $request): JsonResponse
+    public function destroy(Client $client): Response
     {
+        $this->service->delete($client);
 
-        try {
+        return response()->noContent();
+    }
+
+    public function ensureClientContacts(EnsureClientContactsRequest $request, Client $client): JsonResponse
+    {
 
             $validatedData = $request->validated();
 
-            $result = $this->service->delete($validatedData);
+            $result = $this->service->ensureClientContacts($validatedData, $client);
 
-            if (empty($result)) {
-                return response()->json(['message' => 'Client not found'], 404);
-            }
-
-            return response()->json($result, 204);
-
-        } catch (\Exception $exception) {
-            return response()->json($exception->getMessage(), 500);
-        }
-
+            return (new ContactInfoResource($result))
+                    ->additional(["message" => "Added client contacts"])
+                    ->response()->setStatusCode(201);
     }
 
-    public function ensureClientContacts(EnsureClientContactsRequest $request, int $client_id): JsonResponse
+    public function contacts(Client $client): AnonymousResourceCollection
     {
 
-        try {
+        $contacts = $client->contacts()->get();
 
-            $validatedData = $request->validated();
-
-            $result = $this->service->ensureClientContacts($validatedData, $client_id);
-
-            return response()->json($result, 201);
-
-        } catch (\Exception $exception) {
-            return response()->json($exception->getMessage(), 500);
-        }
-
-    }
-
-    public function contacts($client_id): JsonResponse
-    {
-
-        try {
-
-            $contacts = $this->service->getClientContacts($client_id);
-
-            return response()->json($contacts);
-
-        } catch (\Exception $exception) {
-            return response()->json($exception->getMessage(), 500);
-        }
-
+            return (ContactInfoResource::collection($contacts));
     }
 
 }

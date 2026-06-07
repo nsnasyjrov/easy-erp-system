@@ -12,6 +12,7 @@ use App\Services\Company\CompanyService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 
 class   CompanyController extends Controller
@@ -89,7 +90,7 @@ class   CompanyController extends Controller
 
     }
 
-    public function destroy(Company $company)
+    public function destroy(Company $company): Response
     {
 
         if ($company->client()->exists()) abort(409, 'Company is linked to client and cannot be deleted');
