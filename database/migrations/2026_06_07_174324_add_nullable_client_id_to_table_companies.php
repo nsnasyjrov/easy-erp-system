@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('table_companies', function (Blueprint $table) {
+        Schema::table('companies', function (Blueprint $table) {
             $table->integer('client_id')->change();
         });
     }

@@ -30,7 +30,7 @@ class StoreCompanyRequest extends FormRequest
             'legal_address' => ['nullable', 'string', 'max:255'],
             'registration_country' => ['nullable', 'string', 'max:255'],
             'tin_number' => ['required', 'string', 'max:255', Rule::unique('companies', 'tin_number')],
-            'client_id' => ['nullable', 'integer'],
+            'client_id' => ['required', 'integer'],
             'chief_manager' => ['nullable', 'integer'],
 
             'contact_type' => ['nullable', 'string', 'max:255'],
