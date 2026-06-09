@@ -27,7 +27,7 @@ class UpdateCompanyRequest extends FormRequest
             'name' => ['nullable', 'string'],
             'legal_address' => ['nullable', 'string'],
             'registration_country' => ['nullable', 'string'],
-            'chief_manager' => ['nullable', 'integer'],
+            'chief_manager' => ['nullable', 'integer', 'exists:users,id'],
             'tin_number' => ['nullable', 'string'],
             'client_id' => ['nullable', 'string']
         ];
