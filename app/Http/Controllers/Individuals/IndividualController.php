@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Individuals;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Individual\EnsureClientFromIndividualRequest;
 use App\Http\Requests\Individual\StoreIndividualRequest;
+use App\Http\Requests\Individual\UpdateIndividualRequest;
+use App\Http\Resources\ClientResource;
 use App\Http\Resources\IndividualResource;
 use App\Models\Individual;
 use App\Services\Individual\IndividualService;
@@ -44,5 +47,43 @@ class IndividualController extends Controller
             ->response()->setStatusCode(201);
     }
 
+    public function update(UpdateIndividualRequest $request, Individual $individual) : IndividualResource
+    {
+
+        $validatedData = $request->validated();
+
+        if (empty($validatedData)) abort(400, "No fields to update");
+
+        $individual = $this->service->updateIndividual($individual, $validatedData);
+
+        return new IndividualResource($individual);
+    }
+
+    public function destroy(Individual $individual) : void
+    {
+        $this->service->deleteIndividual($individual);
+    }
+
+    public function client(Individual $individual): ClientResource
+    {
+        $client = $individual->client;
+
+        if (empty($client)) abort(409, "The client does not exist for this individual");
+
+        return new ClientResource($client->load('contacts'));
+
+    }
+
+    public function ensureClient(Individual $individual, EnsureClientFromIndividualRequest $request): JsonResponse
+    {
+        $validatedData = $request->validated();
+
+        $client = $this->service->storeClientFromIndividual($individual, $validatedData);
+
+        return (new ClientResource($client))
+               ->additional(["message" => "Client ensured successfully"])
+               ->response()->setStatusCode(201);
+
+    }
 
 }

@@ -15,7 +15,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 
-class CompanyController extends Controller
+class   CompanyController extends Controller
 {
 
     public function __construct(

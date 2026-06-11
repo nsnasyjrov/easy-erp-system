@@ -24,4 +24,11 @@ class Individual extends Model
             'birth_date' => 'date'
             ];
     }
+
+    public function fullName(): string
+    {
+        $fullName = $this->middle_name. ' ' . $this->first_name . ' ' . $this->last_name;
+
+        return trim($fullName);
+    }
 }
