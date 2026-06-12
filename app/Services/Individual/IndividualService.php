@@ -41,11 +41,14 @@ class IndividualService
 
         $client = DB::transaction(function () use ($individual, $validatedData) {
 
-            $client = $individual->client()->create([
-                'type' => ClientType::Company->value,
+            $client = Client::create([
+                'type' => ClientType::Individual->value,
                 'name' => $individual->fullname(),
                 'appearance_date' => $validatedData['appearance_date'],
                 ]);
+
+            $individual->client()->associate($client);
+            $individual->save();
 
             if(isset($validatedData['contacts'])){
 

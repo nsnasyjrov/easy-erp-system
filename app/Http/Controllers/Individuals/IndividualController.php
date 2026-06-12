@@ -52,23 +52,26 @@ class IndividualController extends Controller
 
         $validatedData = $request->validated();
 
-        if (empty($validatedData)) abort(400, "No fields to update");
+        if (empty($validatedData)) abort(422, "No fields to update");
 
         $individual = $this->service->updateIndividual($individual, $validatedData);
 
         return new IndividualResource($individual);
     }
 
-    public function destroy(Individual $individual) : void
+    public function destroy(Individual $individual)
     {
+
         $this->service->deleteIndividual($individual);
+        return response()->noContent();
+
     }
 
     public function client(Individual $individual): ClientResource
     {
         $client = $individual->client;
 
-        if (empty($client)) abort(409, "The client does not exist for this individual");
+        if (empty($client)) abort(404, "The client does not exist for this individual");
 
         return new ClientResource($client->load('contacts'));
 
