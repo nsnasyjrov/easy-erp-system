@@ -64,4 +64,34 @@ class CompanyService
             return $client->load('contacts');
     }
 
+    public function getPaginatedList(array $filters)
+    {
+
+        $query = Company::query();
+
+        $this->applySearch($query, $filters);
+
+        return $query->paginate($filters['per_page'] ?? 20);
+
+    }
+
+    //API QUERIES
+
+    private function applySearch($query, $filters)
+    {
+        if (empty($filters['search'])) {
+            return;
+        }
+
+        $search = $filters['search'];
+
+        $query->where(function ($query) use ($search) {
+            $query->where('name', 'ilike', "%{$search}%")->
+            orWhere('legal_name', 'ilike', "%{$search}%");
+        });
+
+
+
+    }
+
 }

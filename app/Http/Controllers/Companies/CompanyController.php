@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Companies;
 
+use App\Http\Requests\Company\IndexCompanyRequest;
 use App\Http\Requests\Company\StoreClientFromCompanyRequest;
 use App\Http\Requests\Company\StoreCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
@@ -22,10 +23,10 @@ class   CompanyController extends Controller
         private CompanyService $service
     ) {}
 
-    public function index(): AnonymousResourceCollection
+    public function index(IndexCompanyRequest $request): AnonymousResourceCollection
     {
 
-        $companies = Company::latest()->paginate(20);
+        $companies = $this->service->getPaginatedList($request->validated());
 
         return CompanyResource::collection($companies);
     }
