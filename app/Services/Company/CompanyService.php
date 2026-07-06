@@ -68,16 +68,14 @@ class CompanyService
     {
 
         $query = Company::query();
-
         $this->applySearch($query, $filters);
+        $this->applySorting($query, $filters);
 
         return $query->paginate($filters['per_page'] ?? 20);
 
     }
 
-    //API QUERIES
-
-    private function applySearch($query, $filters)
+    private function applySearch($query, array $filters)
     {
         if (empty($filters['search'])) {
             return;
@@ -91,6 +89,37 @@ class CompanyService
         });
 
 
+    }
+
+    private function applySorting($query, array $filters)
+    {
+
+        if (empty($filters['sort'])) {
+            return;
+        }
+
+        $sort_fields = explode(',', strval($filters['sort']));
+
+        $followed_fields = [
+            'name',
+            'legal_name',
+            'legal_address',
+            'registration_country',
+            'created_at'
+        ];
+
+        foreach($sort_fields as $sort_field) {
+
+            $direction = str_starts_with($sort_field, '-') ? 'desc' : 'asc';
+            $field = ltrim($sort_field, '-');
+
+            if(!in_array($field, $followed_fields, true)) {
+                $field = 'created_at';
+                $direction = 'desc';
+            }
+
+            $query->orderBy($field, $direction,);
+        }
 
     }
 
