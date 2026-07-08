@@ -22,4 +22,11 @@ class IndexCompanyRequest extends FormRequest
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100']
         ];
     }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'has_client' => filter_var($this->has_client, FILTER_VALIDATE_BOOLEAN)
+        ]);
+    }
 }

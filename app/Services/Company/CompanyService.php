@@ -68,16 +68,23 @@ class CompanyService
     {
 
         $query = Company::query();
-        $this->applySearch($query, $filters);
-        $this->applySorting($query, $filters);
+        $this->applyQueryFilters($query, $filters);
 
         return $query->paginate($filters['per_page'] ?? 20);
 
     }
 
+    private function applyQueryFilters($query, array $filters)
+    {
+        $this->applySearch($query, $filters);
+        $this->applySorting($query, $filters);
+        $this->applyHasClientSort($query, $filters);
+    }
+
     private function applySearch($query, array $filters)
     {
-        if (empty($filters['search'])) {
+
+        if (!array_key_exists('search', $filters)) {
             return;
         }
 
@@ -94,7 +101,7 @@ class CompanyService
     private function applySorting($query, array $filters)
     {
 
-        if (empty($filters['sort'])) {
+        if (!array_key_exists('sort', $filters)) {
             return;
         }
 
@@ -119,6 +126,24 @@ class CompanyService
             }
 
             $query->orderBy($field, $direction,);
+        }
+
+    }
+
+    private function applyHasClientSort($query, array $filters)
+    {
+
+        if (!array_key_exists('has_client', $filters)) {
+            return;
+        }
+
+        $isClient = $filters['has_client'];
+
+
+        if ($isClient) {
+            $query->whereNotNull("client_id");
+        } else {
+            $query->whereNull("client_id");
         }
 
     }
