@@ -105,9 +105,9 @@ class CompanyService
             return;
         }
 
-        $sort_fields = explode(',', strval($filters['sort']));
+        $sortFields = explode(',', strval($filters['sort']));
 
-        $followed_fields = [
+        $allowedFields = [
             'name',
             'legal_name',
             'legal_address',
@@ -115,17 +115,16 @@ class CompanyService
             'created_at'
         ];
 
-        foreach($sort_fields as $sort_field) {
+        foreach($sortFields as $sort_field) {
 
             $direction = str_starts_with($sort_field, '-') ? 'desc' : 'asc';
             $field = ltrim($sort_field, '-');
 
-            if(!in_array($field, $followed_fields, true)) {
-                $field = 'created_at';
-                $direction = 'desc';
+            if(!in_array($field, $allowedFields, true)) {
+                continue;
             }
 
-            $query->orderBy($field, $direction,);
+            $query->orderBy($field, $direction);
         }
 
     }
@@ -133,12 +132,11 @@ class CompanyService
     private function applyHasClientSort($query, array $filters)
     {
 
-        if (!array_key_exists('has_client', $filters)) {
+        if (empty($filters['has_client'])) {
             return;
         }
 
         $isClient = $filters['has_client'];
-
 
         if ($isClient) {
             $query->whereNotNull("client_id");

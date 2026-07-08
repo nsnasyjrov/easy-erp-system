@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Clients;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\EnsureClientContactsRequest;
+use App\Http\Requests\Client\IndexClientRequest;
 use App\Http\Requests\Client\StoreClientRequest;
 use App\Http\Requests\Client\UpdateClientRequest;
 use App\Http\Resources\ClientResource;
@@ -21,9 +22,9 @@ class ClientController extends Controller
         private ClientService $service
     ) {}
 
-    public function index(): AnonymousResourceCollection
+    public function index(IndexClientRequest $request): AnonymousResourceCollection
     {
-        $clients = Client::latest()->paginate(20);
+        $clients = $this->service->getPaginatedList($request->validated());
 
         return (ClientResource::collection($clients));
     }
