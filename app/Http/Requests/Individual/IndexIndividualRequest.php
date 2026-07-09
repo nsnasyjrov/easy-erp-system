@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Requests\Client;
+namespace App\Http\Requests\Individual;
 
-use App\Enums\ClientType;
+use App\Enums\Sex;
+use App\Models\Individual;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class IndexClientRequest extends FormRequest
+class IndexIndividualRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,24 +26,26 @@ class IndexClientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'search' => ['nullable', 'string', 'max:256'],
-            'type' => ['nullable', Rule::enum(ClientType::class)],
+            'search' => ['nullable', 'string'],
             'sort' => ['nullable', 'string'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100']
+            'sex' => ['nullable', Rule::enum(Sex::class)],
+            'age' => ['nullable', 'integer', 'min:18', 'max:65'],
+            'per_page' => ['nullable', 'integer', 'min: 1', 'max:100']
         ];
     }
 
     protected function prepareForValidation()
     {
-        if(empty($this->input('type'))) return;
+        $inputtedSex = Sex::tryFrom(mb_strtolower($this->input('sex')));
 
-        $clientType = ClientType::tryFrom(mb_strtolower($this->input('type')));
+        if(empty($inputtedSex)) {
+            return;
+        }
 
-        if(empty($clientType)) abort(404, "There is no such client type");
+        if(empty($inputtedSex)) abort(422, "An incorrect value was entered");
 
         $this->merge([
-            'type' => $clientType->value
+            'sex' => $inputtedSex->value
         ]);
     }
-
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Individuals;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Individual\EnsureClientFromIndividualRequest;
+use App\Http\Requests\Individual\IndexIndividualRequest;
 use App\Http\Requests\Individual\StoreIndividualRequest;
 use App\Http\Requests\Individual\UpdateIndividualRequest;
 use App\Http\Resources\ClientResource;
@@ -20,10 +21,10 @@ class IndividualController extends Controller
         private IndividualService $service
     ) {}
 
-    public function index(): AnonymousResourceCollection
+    public function index(IndexIndividualRequest $request): AnonymousResourceCollection
     {
 
-        $individuals = Individual::latest()->paginate(20);
+        $individuals = $this->service->getPaginatedList($request->validated());
 
         return (IndividualResource::collection($individuals));
     }

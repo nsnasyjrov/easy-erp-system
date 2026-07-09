@@ -4,8 +4,8 @@ namespace App\Enums;
 
 enum Sex: string
 {
-    case Male = "Male";
-    case Female = "Female";
+    case Male = "male";
+    case Female = "female";
 
     public function label(): string
     {

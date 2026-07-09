@@ -25,6 +25,8 @@ class IndexCompanyRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+        if(empty($this->input('has_client'))) return;
+
         $this->merge([
             'has_client' => filter_var($this->has_client, FILTER_VALIDATE_BOOLEAN)
         ]);
