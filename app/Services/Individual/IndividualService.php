@@ -84,6 +84,7 @@ class IndividualService
         $this->applySearch($query, $filters);
         $this->applySort($query, $filters);
         $this->applySexFilter($query, $filters);
+        $this->applyAgeFilter($query, $filters);
 
     }
 
