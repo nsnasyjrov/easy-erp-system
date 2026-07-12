@@ -4,8 +4,9 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class RegisterUserRequest extends FormRequest
+class LoginUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,14 +23,13 @@ class RegisterUserRequest extends FormRequest
      */
     public function rules(): array
     {
+        if(Auth::guard('sanctum')->check()) {
+            return [];
+        }
+
         return [
-            'login' => ['required', 'string', 'max:255', 'unique:users,login'],
-            'first_name' => ['required', 'string', 'max:255'],
-            'middle_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'max:255', 'email', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'max:256'],
-            'remember_me' => ['nullable','bool'],
+            'email' => ['required', 'string', 'email', 'exists:users,email'],
+            'password' => ['required', 'string'],
             'device_name' => ['required', 'string']
         ];
     }
