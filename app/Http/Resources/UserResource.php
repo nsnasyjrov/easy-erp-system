@@ -23,7 +23,6 @@ class UserResource extends JsonResource
             'first_name' => $this->first_name,
             'middle_name' => $this->middle_name,
             'last_name' => $this->last_name,
-            'remember_token' => $this->remember_token,
             'created_at' => $this->created_at->ToDateTimeString(),
             'updated_at' => $this->updated_at->ToDateTimeString(),
 
