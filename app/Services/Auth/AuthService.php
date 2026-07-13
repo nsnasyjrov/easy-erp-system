@@ -40,7 +40,7 @@ class AuthService
 
             if(Hash::check($data['password'], $user->password))
             {
-                $token = $user->createToken($data['device_name']);
+                $token = $user->createToken($data['device_name'])->plainTextToken;
                 $success = True;
             }
 

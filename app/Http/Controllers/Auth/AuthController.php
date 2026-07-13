@@ -50,7 +50,7 @@ class AuthController extends Controller
         if ($result['success']) {
             $status_code = 200;
         } else {
-            $status_code = 401;
+            $status_code = 422;
         }
 
         return response()->json($data, $status_code);
