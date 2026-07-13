@@ -16,7 +16,6 @@ class AuthService
         $result = DB::transaction(function() use($data) {
             $model = User::make($data);
 
-
             $model->save();
             $token = $model->createToken($data['device_name'])->plainTextToken;
 
@@ -34,6 +33,14 @@ class AuthService
             $token = null;
 
             $user = User::where('email', $data['email'])->first();
+
+            if (!$user || Hash::check($data['password'], $user->password)) {
+                return [
+                    'success' => False,
+                    'token' => $token,
+                    'user' => $user
+                ];
+            }
 
             if(Hash::check($data['password'], $user->password))
             {
