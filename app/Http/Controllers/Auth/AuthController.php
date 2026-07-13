@@ -30,7 +30,7 @@ class AuthController extends Controller
 
     public function profile(Request $request)
     {
-        return $request->user();
+        return new UserResource($request->user());
     }
 
     public function login(LoginUserRequest $request)
@@ -45,7 +45,7 @@ class AuthController extends Controller
 
         $data = ['status' => ($result['success']) ? 'success' : 'warning',
             'token' => $result['token'],
-            'user' => $result['user']];
+            'user' => new UserResource($result['user'])];
 
         if ($result['success']) {
             $status_code = 200;

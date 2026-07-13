@@ -16,9 +16,6 @@ class AuthService
         $result = DB::transaction(function() use($data) {
             $model = User::make($data);
 
-            if(array_key_exists('remember_me', $data)) {
-                $model->remember_token = Str::random(60);
-            }
 
             $model->save();
             $token = $model->createToken($data['device_name'])->plainTextToken;
