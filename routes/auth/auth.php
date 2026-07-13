@@ -15,6 +15,10 @@ Route::prefix('auth')->group(function () {
 
         Route::get('logout', [AuthController::class, 'logout']);
 
+        Route::get('logout-all', [AuthController::class, 'logoutAll']);
+
+        Route::get('tokens', [AuthController::class, 'tokens']);
+
     });
 
 });

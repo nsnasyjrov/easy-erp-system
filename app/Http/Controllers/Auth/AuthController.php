@@ -48,7 +48,11 @@ class AuthController extends Controller
         $authenticatedUser = Auth::guard('sanctum')->user();
 
         if($authenticatedUser !== null) {
-            return new UserResource($authenticatedUser);
+            return response()->json([
+                'status' => 'warning',
+                'message' => 'You are already logged in',
+                'data' => new UserResource($authenticatedUser)
+            ]);
         }
 
         $result =  $this->service->login($request->validated());
@@ -71,6 +75,42 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()?->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function logoutAll(Request $request)
+    {
+
+        $request->user()->tokens()->delete();
+
+        return response()->json([null, 204]);
+
+    }
+
+    public function tokens(Request $request): JsonResponse
+    {
+
+        $authenticatedUser = Auth::guard('sanctum')->user();
+
+        if(empty($authenticatedUser)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Bad request'
+            ], 401);
+        }// не может быть empty - всегда в авторизации
+
+        $tokensPlainText = [];
+        foreach($authenticatedUser->tokens()->get() as $token) {
+            $tokensPlainText[] = [
+                'id' => $token->id,
+                'device' => $token->name,
+                'abilities' => $token->abilities,
+                'created_at' => $token->created_at];
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $tokensPlainText
+        ], 200);
     }
 
 }
