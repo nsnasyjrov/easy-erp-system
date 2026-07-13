@@ -13,6 +13,8 @@ Route::prefix('auth')->group(function () {
 
         Route::get('profile', [AuthController::class, 'profile']);
 
+        Route::get('logout', [AuthController::class, 'logout']);
+
     });
 
 });
