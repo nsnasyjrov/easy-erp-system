@@ -3,7 +3,7 @@
 use App\Http\Controllers\Individuals\IndividualController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('individuals')->group(function () {
+Route::middleware('auth:sanctum')->prefix('individuals')->group(function () {
 
     Route::get('/', [IndividualController::class, 'index']);
 
