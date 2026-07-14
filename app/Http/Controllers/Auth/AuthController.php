@@ -98,19 +98,26 @@ class AuthController extends Controller
             ], 401);
         }// не может быть empty - всегда в авторизации
 
-        $tokensPlainText = [];
-        foreach($authenticatedUser->tokens()->get() as $token) {
-            $tokensPlainText[] = [
-                'id' => $token->id,
-                'device' => $token->name,
-                'abilities' => $token->abilities,
-                'created_at' => $token->created_at];
-        }
+        $tokensPlainText = $this->service->getTokenPlainTexts($authenticatedUser);
 
         return response()->json([
             'status' => 'success',
             'data' => $tokensPlainText
         ], 200);
+    }
+
+    public function deleteToken(Request $request, $tokenId)
+    {
+        $deleted = $request->user()->tokens()->find($tokenId)->delete();
+
+        if($deleted === 0) {
+            return response()->json([
+                'success' => 'fail',
+                'message' => 'Token not found'
+            ], 404);
+        }
+
+        return response()->noContent();
     }
 
 }
