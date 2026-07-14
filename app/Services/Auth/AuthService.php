@@ -58,5 +58,20 @@ class AuthService
         return $result;
     }
 
+    public function getTokenPlainTexts($authenticatedUser)
+    {
+
+        $tokensPlainText = [];
+        foreach($authenticatedUser->tokens()->get() as $token) {
+            $tokensPlainText[] = [
+                'id' => $token->id,
+                'device' => $token->name,
+                'abilities' => $token->abilities,
+                'created_at' => $token->created_at];
+        }
+
+        return $tokensPlainText;
+    }
+
 
 }
