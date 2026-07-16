@@ -14,10 +14,12 @@ class AuthService
     {
 
         $result = DB::transaction(function() use($data) {
+            $expiration = (array_key_exists('remember_me', $data) && $data['remember_me']) ? 43200 : 30;
+
             $model = User::make($data);
 
             $model->save();
-            $token = $model->createToken($data['device_name'])->plainTextToken;
+            $token = $model->createToken($data['device_name'], ['*'], now()->addMinutes($expiration))->plainTextToken;
 
             return ['user' => $model, 'token' => $token];
         });
@@ -44,7 +46,9 @@ class AuthService
 
             if(Hash::check($data['password'], $user->password))
             {
-                $token = $user->createToken($data['device_name'])->plainTextToken;
+                $expiration = (array_key_exists('remember_me', $data) && $data['remember_me']) ? 43200 : 30;
+
+                $token = $user->createToken($data['device_name'], ['*'], now()->addMinutes($expiration))->plainTextToken;
                 $success = True;
             }
 

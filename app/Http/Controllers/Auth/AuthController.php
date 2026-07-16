@@ -119,5 +119,4 @@ class AuthController extends Controller
 
         return response()->noContent();
     }
-
 }
