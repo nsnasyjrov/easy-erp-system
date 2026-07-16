@@ -30,7 +30,16 @@ class LoginUserRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
-            'device_name' => ['required', 'string']
+            'device_name' => ['required', 'string'],
+            'remember_me'=> ['nullable', 'boolean']
         ];
     }
+
+    public function prepareForValidation()
+    {
+        $this->merge([
+            'remember_me' => filter_var($this->remember_me, FILTER_VALIDATE_BOOLEAN)
+        ]);
+    }
+
 }

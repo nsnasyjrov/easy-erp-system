@@ -35,8 +35,16 @@ class RegisterUserRequest extends FormRequest
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'max:255', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'max:256'],
-            'remember_me' => ['nullable','bool'],
+            'remember_me' => ['nullable','boolean'],
             'device_name' => ['required', 'string']
         ];
     }
+
+    public function prepareForValidation()
+    {
+        $this->merge([
+            'remember_me' => filter_var($this->remember_me, FILTER_VALIDATE_BOOLEAN)
+        ]);
+    }
+
 }
