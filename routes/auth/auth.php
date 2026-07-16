@@ -19,8 +19,9 @@ Route::prefix('auth')->group(function () {
 
         Route::get('tokens', [AuthController::class, 'tokens']);
 
-        Route::delete('tokens/{token}', [AuthController::class, 'deleteToken'])->whereNumber('token')->middleware('sanctum');
+        Route::delete('tokens/{token}', [AuthController::class, 'deleteToken'])->whereNumber('token')->middleware('auth:sanctum');
 
     });
 
 });
+

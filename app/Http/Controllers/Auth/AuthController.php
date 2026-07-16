@@ -59,12 +59,13 @@ class AuthController extends Controller
 
         $data = ['status' => ($result['success']) ? 'success' : 'warning',
             'token' => $result['token'],
-            'user' => (empty($result['user']) ? 'No data' : new UserResource($result['user']))];
+            'user' => (empty($result['user']) ? 'No data' : new UserResource($result['user'])),
+            'message' => $result['message']];
 
         if ($result['success']) {
             $status_code = 200;
         } else {
-            $status_code = 422;
+            $status_code = 401;
         }
 
         return response()->json($data, $status_code);
@@ -82,7 +83,7 @@ class AuthController extends Controller
 
         $request->user()->tokens()->delete();
 
-        return response()->json([null, 204]);
+        return response()->noContent();
 
     }
 
@@ -106,11 +107,12 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function deleteToken(Request $request, $tokenId)
+        public function deleteToken(Request $request, $tokenId)
     {
-        $deleted = $request->user()->tokens()->find($tokenId)->delete();
+        $token = $request->user()->tokens()->find($tokenId);
 
-        if($deleted === 0) {
+        if(!empty($token)) {
+            $token->delete();
             return response()->json([
                 'success' => 'fail',
                 'message' => 'Token not found'

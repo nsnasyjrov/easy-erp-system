@@ -14,7 +14,7 @@ class AuthService
     {
 
         $result = DB::transaction(function() use($data) {
-            $expiration = (array_key_exists('remember_me', $data) && $data['remember_me']) ? 43200 : 30;
+            $expiration = (array_key_exists('remember_me', $data) && $data['remember_me']) ? 43200 : 2880;
 
             $model = User::make($data);
 
@@ -32,29 +32,26 @@ class AuthService
 
         $result = DB::transaction(function() use ($data) {
             $success = False;
-            $token = null;
 
             $user = User::where('email', $data['email'])->first();
 
             if (!$user || !Hash::check($data['password'], $user->password)) {
                 return [
                     'success' => False,
-                    'token' => $token,
-                    'user' => $user
+                    'token' => null,
+                    'user' => null,
+                    'message' => 'Invalid credentials'
                 ];
             }
 
-            if(Hash::check($data['password'], $user->password))
-            {
-                $expiration = (array_key_exists('remember_me', $data) && $data['remember_me']) ? 43200 : 30;
+            $expiration = (array_key_exists('remember_me', $data) && $data['remember_me']) ? 43200 : 2880;
 
-                $token = $user->createToken($data['device_name'], ['*'], now()->addMinutes($expiration))->plainTextToken;
-                $success = True;
-            }
+            $token = $user->createToken($data['device_name'], ['*'], now()->addMinutes($expiration))->plainTextToken;
+            $success = True;
 
             $user = ($success) ? $user : null;
 
-            $result = ['success' => $success, 'token' => $token, 'user' => $user];
+            $result = ['success' => $success, 'token' => $token, 'user' => $user, 'message' => 'You are authenticated.'];
 
             return $result;
         });
