@@ -13,9 +13,9 @@ Route::prefix('auth')->group(function () {
 
         Route::get('profile', [AuthController::class, 'profile']);
 
-        Route::get('logout', [AuthController::class, 'logout']);
+        Route::delete('logout', [AuthController::class, 'logout']);
 
-        Route::get('logout-all', [AuthController::class, 'logoutAll']);
+        Route::delete('logout-all', [AuthController::class, 'logoutAll']);
 
         Route::get('tokens', [AuthController::class, 'tokens']);
 
