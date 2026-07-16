@@ -111,14 +111,14 @@ class AuthController extends Controller
     {
         $token = $request->user()->tokens()->find($tokenId);
 
-        if(!empty($token)) {
-            $token->delete();
+        if(empty($token)) {
             return response()->json([
                 'success' => 'fail',
                 'message' => 'Token not found'
             ], 404);
         }
 
+        $token->delete();
         return response()->noContent();
     }
 }
