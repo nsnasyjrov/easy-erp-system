@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\EmailVerifyController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -8,6 +9,9 @@ Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 
     Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+
+    Route::get('email/verify/{id}/{hash}', [EmailVerifyController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
     Route::middleware('auth:sanctum')->group(function() {
 

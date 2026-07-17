@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginUserRequest;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Http\Resources\UserResource;
+use App\Notifications\Auth\UserRegisteredNotification;
 use App\Services\Auth\AuthService;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,8 +32,10 @@ class AuthController extends Controller
             ]);
         }
 
-
         $result = $this->service->register($request->validated());
+
+        //$result['user']->notify(new UserRegisteredNotification());
+        event(new Registered($result['user']));
 
         return response()->json(['status' => 'success',
                                  'user' => new UserResource($result['user']),
