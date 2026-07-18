@@ -23,7 +23,7 @@ class EmailVerifyController extends Controller
         if ($user->hasVerifiedEmail()) {
             return response()->json([
                 'status' => 'warning',
-                'You have already confirmed your email earlier'
+                'message' => 'You have already confirmed your email earlier'
             ]);
         }
 
@@ -33,7 +33,7 @@ class EmailVerifyController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'Email address verified successfully.'
+            'message' => 'Email address verified successfully.'
         ]);
     }
 }
