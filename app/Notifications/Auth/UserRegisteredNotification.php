@@ -2,8 +2,8 @@
 
 namespace App\Notifications\Auth;
 
+use App\Utils\MailUtils;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -40,7 +40,9 @@ class UserRegisteredNotification extends Notification
             ->line('Your account has been successfully created.')
             ->line("Your login(email): {$notifiable->email}.")
             ->line('You can sign in to EASY ERP.')
-            ->salutation('Easy ERP system');
+            ->salutation('Easy ERP system')
+            ->withSymfonyMessage([MailUtils::class, 'attachLogo', ]);
+
     }
 
     /**
