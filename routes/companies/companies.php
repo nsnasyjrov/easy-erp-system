@@ -3,7 +3,7 @@
 use App\Http\Controllers\Companies\CompanyController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->prefix('companies')->group(function () {
+Route::middleware(['auth:sanctum', 'verified'])->prefix('companies')->group(function () {
 
     //Base GET companies route
     Route::get('/', [CompanyController::class, 'index']);

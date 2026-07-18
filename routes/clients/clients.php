@@ -3,7 +3,7 @@
 use App\Http\Controllers\Clients\ClientController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->prefix('clients')->group(function () {
+Route::middleware(['auth:sanctum', 'verified'])->prefix('clients')->group(function () {
 
     Route::get('/', [ClientController::class, 'index']);
 
