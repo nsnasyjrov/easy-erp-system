@@ -123,4 +123,14 @@ class AuthController extends Controller
         $token->delete();
         return response()->noContent();
     }
+    public function forgotPassword(ForgotPasswordUserRequest $request)
+    {
+        $this->service->forgotPassword($request['email']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'If a user with such an email exists, then a letter is sent to him with a link to restore access.'
+        ], 200);
+
+    }
 }
