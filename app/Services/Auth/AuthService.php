@@ -72,6 +72,18 @@ class AuthService
     }
 
 
+            event(new Verified($user));
+
+            $status = 'success';
+            $message = 'Email address verified successfully.';
+            $status_code = 200;
+        }
+
+        return ['status'     => $status,
+                'message'    => $message,
+                'status_code'=> $status_code];
+    }
+
     public function forgotPassword(string $email)
     {
         Password::sendResetLink(

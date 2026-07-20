@@ -123,6 +123,17 @@ class AuthController extends Controller
         $token->delete();
         return response()->noContent();
     }
+
+    public function verify(int $id, string $hash)
+    {
+        $result = $this->service->verifyEmail($id, $hash);
+
+        return response()->json([
+            'status' => $result['status'],
+            'message' => $result['message']
+        ], $result['status_code']);
+    }
+
     public function forgotPassword(ForgotPasswordUserRequest $request)
     {
         $this->service->forgotPassword($request['email']);
