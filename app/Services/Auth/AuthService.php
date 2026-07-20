@@ -2,7 +2,7 @@
 
 namespace App\Services\Auth;
 
-use App\Events\PasswordResetRequested;
+use App\Events\PasswordResetRequestedEvent;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\DB;
@@ -74,37 +74,40 @@ class AuthService
         return $tokensPlainText;
     }
 
-    public function verifyEmail(int $id, string $hash)
+    public function verify(int $id, string $hash)
     {
-
         $user = User::query()->findOrFail($id);
 
-        $status = null;
-        $message = null;
-        $status_code = null;
-
         if(!hash_equals(sha1($user->getEmailForVerification()), $hash)) {
-            $status = 'error';
-            $message = 'Invalid verification link';
-            $status_code = 403;
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid verification link'
+            ], 403);
         }
 
         if ($user->hasVerifiedEmail()) {
-            $status = 'warning';
-            $message = 'You have already confirmed your email earlier';
-            $status_code = 200;
+            return response()->json([
+                'status' => 'warning',
+                'You have already confirmed your email earlier'
+            ]);
         }
 
-        if ($status != 'error' and $status != 'warning') {
+        $user->markEmailAsVerified();
 
-            $user->markEmailAsVerified();
+        event(new Verified($user));
+
+        return response()->json([
+            'status' => 'success',
+            'Email address verified successfully.'
+        ]);
+    }
 
     public function forgotPassword(string $email)
     {
         Password::sendResetLink(
             ['email' => $email],
             function(User $user, string $token): void {
-                event(new PasswordResetRequested($user, $token));
+                event(new PasswordResetRequestedEvent($user, $token));
             }
         );
 

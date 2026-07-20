@@ -2,10 +2,10 @@
 
 namespace App\Listeners\Auth;
 
-use App\Events\PasswordResetRequested;
+use App\Events\PasswordResetRequestedEvent;
 use App\Notifications\Auth\UserForgotPasswordNotification;
 
-class SendResetPasswordMessage
+class SendResetPasswordMessageListener
 {
     /**
      * Create the event listener.
@@ -16,7 +16,7 @@ class SendResetPasswordMessage
     /**
      * Handle the event.
      */
-    public function handle(PasswordResetRequested $event): void
+    public function handle(PasswordResetRequestedEvent $event): void
     {
         $event->user->notify(new UserForgotPasswordNotification($event->token));
     }

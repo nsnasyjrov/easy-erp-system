@@ -9,7 +9,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PasswordResetRequested
+class PasswordResetRequestedEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

@@ -7,7 +7,7 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class SendWelcomeAfterVerification
+class SendWelcomeAfterVerificationListener
 {
     /**
      * Create the event listener.
