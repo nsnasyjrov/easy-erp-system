@@ -2,9 +2,12 @@
 
 namespace App\Services\Auth;
 
+use App\Events\PasswordResetRequested;
 use App\Models\User;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 
 class AuthService
 {
@@ -71,6 +74,30 @@ class AuthService
         return $tokensPlainText;
     }
 
+    public function verifyEmail(int $id, string $hash)
+    {
+
+        $user = User::query()->findOrFail($id);
+
+        $status = null;
+        $message = null;
+        $status_code = null;
+
+        if(!hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+            $status = 'error';
+            $message = 'Invalid verification link';
+            $status_code = 403;
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            $status = 'warning';
+            $message = 'You have already confirmed your email earlier';
+            $status_code = 200;
+        }
+
+        if ($status != 'error' and $status != 'warning') {
+
+            $user->markEmailAsVerified();
 
             event(new Verified($user));
 
