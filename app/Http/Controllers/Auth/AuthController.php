@@ -145,4 +145,16 @@ class AuthController extends Controller
             'message' => $result['message'],
         ], $result['code']);
     }
+
+    public function resetPassword(Request $request)
+    {
+        $token = $request->query('token');
+        $email = $request->query('email');
+
+        $result = $this->service->resetPassword($token, $email);
+
+        return response()->json([
+            'status'
+        ]);
+    }
 }

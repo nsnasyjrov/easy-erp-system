@@ -151,4 +151,9 @@ class AuthService
             'code' => $code
         ];
     }
+
+    public function resetPassword(string $token, string $email): bool
+    {
+        return True;
+    }
 }
