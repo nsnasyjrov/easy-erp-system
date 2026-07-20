@@ -43,4 +43,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Company::class, 'chief_manager_id');
     }
 
+    public function fullName(): string
+    {
+        $fullName = $this->middle_name. ' ' . $this->first_name . ' ' . $this->last_name;
+
+        return trim($fullName);
+    }
+
 }
