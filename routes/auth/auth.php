@@ -10,10 +10,12 @@ Route::prefix('auth')->group(function () {
 
     Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
-    Route::get('email/verify/{id}/{hash}', [EmailVerifyController::class, 'verify'])
+    Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verify'])
         ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
-    Route::middleware('auth:sanctum')->group(function() {
+    Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:6,1');
+
+    Route::middleware(['auth:sanctum', 'verified'])->group(function() {
 
         Route::get('profile', [AuthController::class, 'profile']);
 

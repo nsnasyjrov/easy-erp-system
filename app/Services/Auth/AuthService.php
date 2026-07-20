@@ -72,4 +72,14 @@ class AuthService
     }
 
 
+    public function forgotPassword(string $email)
+    {
+        Password::sendResetLink(
+            ['email' => $email],
+            function(User $user, string $token): void {
+                event(new PasswordResetRequested($user, $token));
+            }
+        );
+
+    }
 }
