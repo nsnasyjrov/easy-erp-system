@@ -112,4 +112,43 @@ class AuthService
         );
 
     }
+
+    public function verifyEmail(int $id, string $hash)
+    {
+        $user = User::query()->findOrFail($id);
+
+        $status  = null;
+        $message = null;
+        $code  = null;
+
+        if(!hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+
+            $status = 'error';
+            $message ='Invalid verification link';
+            $code = 403;
+
+        }
+
+        if ($user->hasVerifiedEmail()) {
+
+            $status = 'warning';
+            $message ='You have already confirmed your email earlier';
+            $code = 200;
+
+        } else {
+            $user->markEmailAsVerified();
+
+            event(new Verified($user));
+
+            $status = 'success';
+            $message ='We sent a verification letter to the post office.';
+            $code = 200;
+        }
+
+        return [
+            'status' => $status,
+            'message' => $message,
+            'code' => $code
+        ];
+    }
 }

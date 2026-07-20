@@ -134,4 +134,15 @@ class AuthController extends Controller
         ], 200);
 
     }
+
+    public function verify(int $id, string $hash)
+    {
+
+        $result = $this->service->verifyEmail($id, $hash);
+
+        return response()->json([
+            'status' => $result['status'],
+            'message' => $result['message'],
+        ], $result['code']);
+    }
 }
