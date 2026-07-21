@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ForgotPasswordUserRequest;
 use App\Http\Requests\Auth\LoginUserRequest;
 use App\Http\Requests\Auth\RegisterUserRequest;
+use App\Http\Requests\Auth\ResetPasswordUserRequest;
 use App\Http\Resources\UserResource;
 use App\Services\Auth\AuthService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
@@ -146,15 +148,23 @@ class AuthController extends Controller
         ], $result['code']);
     }
 
-    public function resetPassword(Request $request)
+    public function resetPassword(ResetPasswordUserRequest $request)
     {
-        $token = $request->query('token');
-        $email = $request->query('email');
 
-        $result = $this->service->resetPassword($token, $email);
+        $validated = $request->validated();
+
+        $status = $this->service->resetPassword($validated);
+
+        if($status !== Password::PASSWORD_RESET) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'The link is invalid or out of date.'
+            ], 422);
+        }
 
         return response()->json([
-            'status'
-        ]);
+            'status' => 'success',
+            'message' => 'The password has been successfully changed.'
+        ], 200);
     }
 }

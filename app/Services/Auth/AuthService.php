@@ -4,6 +4,7 @@ namespace App\Services\Auth;
 
 use App\Events\PasswordResetRequestedEvent;
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -152,8 +153,21 @@ class AuthService
         ];
     }
 
-    public function resetPassword(string $token, string $email): bool
+    public function resetPassword(array $data)
     {
-        return True;
+
+        $status = Password::reset($data, function(User $user, string $password) {
+
+            $user->forceFill([
+                'password' => Hash::make($password)
+            ]);
+
+            $user->save();
+
+            $user->tokens()->delete();
+            event(new PasswordReset($user));
+        });
+
+        return $status;
     }
 }

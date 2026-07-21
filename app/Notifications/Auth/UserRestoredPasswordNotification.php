@@ -4,19 +4,18 @@ namespace App\Notifications\Auth;
 
 use App\Utils\MailUtils;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-    class UserForgotPasswordNotification extends Notification
+class UserRestoredPasswordNotification extends Notification
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(
-        private readonly string $token
-    )
+    public function __construct()
     {
         //
     }
@@ -36,20 +35,13 @@ use Illuminate\Notifications\Notification;
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $url = url('api/auth/reset-password?' . http_build_query([
-                'token' => $this->token,
-                'email' => $notifiable->email
-            ]));
-
         return (new MailMessage)
-            ->subject('Forgot password')
-            ->greeting("Hello, {$notifiable->fullName()}")
-            ->line('We have sent you a link to reset your password..')
-            ->action("Restore access", $url)
-            ->line("If you are not the one trying to restore access, then do nothing.")
+            ->subject('Password recovery')
+            ->greeting("Hello, {$notifiable->first_name}")
+            ->line('Your password has been successfully changed!')
+            ->line('You can sign in to EASY ERP.')
             ->salutation('Easy ERP system')
-            ->withSymfonyMessage([MailUtils::class, 'attachLogo',]);
-
+            ->withSymfonyMessage([MailUtils::class, 'attachLogo', ]);
     }
 
     /**
