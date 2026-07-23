@@ -28,6 +28,7 @@ Route::prefix('auth')->group(function () {
 
         Route::delete('tokens/{token}', [AuthController::class, 'deleteToken'])->whereNumber('token');
 
+        Route::patch('password', [AuthController::class, 'changeCurrentPassword'])->middleware('throttle:6,1');
 
         Route::post('verification-notification', [AuthController::class, 'resendVerificationEmail'])->middleware('throttle:6,1');
     });

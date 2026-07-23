@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ChangeCurrentPasswordUserRequest;
 use App\Http\Requests\Auth\ForgotPasswordUserRequest;
 use App\Http\Requests\Auth\LoginUserRequest;
 use App\Http\Requests\Auth\RegisterUserRequest;
@@ -112,7 +113,7 @@ class AuthController extends Controller
         ], 200);
     }
 
-        public function deleteToken(Request $request, $tokenId)
+    public function deleteToken(Request $request, $tokenId)
     {
         $token = $request->user()->tokens()->find($tokenId);
 
@@ -177,5 +178,14 @@ class AuthController extends Controller
             'status' => $result['status'],
             'message' => $result['message'],
              ], $result['code']);
+    }
+
+    public function changeCurrentPassword(ChangeCurrentPasswordUserRequest $request)
+    {
+
+        $this->service->changeCurrentPassword($request->user(), $request->validated());
+
+
+        return response()->noContent();
     }
 }
