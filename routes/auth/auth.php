@@ -9,7 +9,6 @@ Route::prefix('auth')->group(function () {
 
     Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
-
     Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verify'])
         ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
@@ -29,6 +28,8 @@ Route::prefix('auth')->group(function () {
 
         Route::delete('tokens/{token}', [AuthController::class, 'deleteToken'])->whereNumber('token');
 
+
+        Route::post('verification-notification', [AuthController::class, 'resendVerificationEmail'])->middleware('throttle:6,1');
     });
 
 });

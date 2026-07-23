@@ -126,6 +126,7 @@ class AuthController extends Controller
         $token->delete();
         return response()->noContent();
     }
+
     public function forgotPassword(ForgotPasswordUserRequest $request)
     {
         $this->service->forgotPassword($request->validated('email'));
@@ -166,5 +167,15 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'The password has been successfully changed.'
         ], 200);
+    }
+
+    public function resendVerificationEmail(Request $request)
+    {
+        $result = $this->service->resendVerificationEmail($request->user);
+
+        return response()->json([
+            'status' => $result['status'],
+            'message' => $result['message'],
+             ], $result['code']);
     }
 }

@@ -134,4 +134,30 @@ class AuthService
 
         return $status;
     }
+
+    public function resendVerificationEmail(User $user)
+    {
+
+        if ($user->hasVerifiedEmail()) {
+
+            $status = 'warning';
+            $message ='You have already confirmed your email earlier';
+            $code = 200;
+
+        } else {
+            $user->markEmailAsVerified();
+
+            event(new Verified($user));
+
+            $status = 'success';
+            $message ='We sent a verification letter to the post office.';
+            $code = 200;
+        }
+
+        return [
+            'status' => $status,
+            'message' => $message,
+            'code' => $code
+        ];
+    }
 }
