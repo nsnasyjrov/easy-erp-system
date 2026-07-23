@@ -4,6 +4,7 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class ResetPasswordUserRequest extends FormRequest
 {
@@ -25,7 +26,7 @@ class ResetPasswordUserRequest extends FormRequest
         return [
             'token' => ['required', 'string'],
             'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string', 'confirmed'],
+            'password' => ['required', 'string', 'confirmed', PasswordRule::min(8)],
             'password_confirmation' => ['required', 'string']
         ];
     }

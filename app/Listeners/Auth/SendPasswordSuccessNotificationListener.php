@@ -7,7 +7,7 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class SendPasswordSuccessfullyNotificationListener
+class SendPasswordSuccessNotificationListener
 {
     /**
      * Create the event listener.

@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 class PasswordResetRequestedEvent
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, SerializesModels;
 
     /**
      * Create a new event instance.
@@ -21,15 +21,4 @@ class PasswordResetRequestedEvent
         public string $token){
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, Channel>
-     */
-    public function broadcastOn(): array
-    {
-        return [
-            new PrivateChannel('channel-name'),
-        ];
-    }
 }
