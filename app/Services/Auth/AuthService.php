@@ -118,16 +118,12 @@ class AuthService
     {
         $user = User::query()->findOrFail($id);
 
-        $status  = null;
+        $status = null;
         $message = null;
-        $code  = null;
+        $code = null;
 
         if(!hash_equals(sha1($user->getEmailForVerification()), $hash)) {
-
-            $status = 'error';
-            $message ='Invalid verification link';
-            $code = 403;
-
+            return [$status = 'error', $message ='Invalid verification link', $code = 403];
         }
 
         if ($user->hasVerifiedEmail()) {

@@ -128,7 +128,7 @@ class AuthController extends Controller
     }
     public function forgotPassword(ForgotPasswordUserRequest $request)
     {
-        $this->service->forgotPassword($request['email']);
+        $this->service->forgotPassword($request->validated('email'));
 
         return response()->json([
             'status' => 'success',
