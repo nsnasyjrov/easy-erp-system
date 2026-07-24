@@ -6,7 +6,6 @@ use App\Events\PasswordResetRequestedEvent;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -168,6 +167,6 @@ class AuthService
         $user->password = Hash::make($data['password']);
         $user->save();
 
-        //event(new ResetPassword($user)); TODO: make the email sent after the password is changed by an authenticated user
+        event(new PasswordReset($user)); //TODO: make the email sent after the password is changed by an authenticated user
     }
 }
