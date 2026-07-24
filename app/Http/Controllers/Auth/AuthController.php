@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ChangeCurrentPasswordUserRequest;
+use App\Http\Requests\Auth\ChangeEmailUserRequest;
 use App\Http\Requests\Auth\ForgotPasswordUserRequest;
 use App\Http\Requests\Auth\LoginUserRequest;
 use App\Http\Requests\Auth\RegisterUserRequest;
@@ -150,6 +151,16 @@ class AuthController extends Controller
         ], $result['code']);
     }
 
+    public function verifyNewEmail(int $id, string $hash)
+    {
+
+        $this->service->verifyNewEmail($id, $hash);
+
+        return response()->json([
+            'Email successfully verified and changed', 200
+        ]);
+    }
+
     public function resetPassword(ResetPasswordUserRequest $request)
     {
 
@@ -188,4 +199,11 @@ class AuthController extends Controller
 
         return response()->noContent();
     }
+
+    public function changeEmail(ChangeEmailUserRequest $request)
+    {
+        $this->service->changeEmail($request->user(), $request->validated('email'));
+
+    }
+
 }

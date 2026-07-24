@@ -2,7 +2,7 @@
 
 namespace App\Listeners\Auth;
 
-use App\Events\PasswordResetRequestedEvent;
+use App\Events\Auth\PasswordResetRequestedEvent;
 use App\Notifications\Auth\UserForgotPasswordNotification;
 
 class SendResetPasswordMessageListener

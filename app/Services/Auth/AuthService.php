@@ -2,12 +2,14 @@
 
 namespace App\Services\Auth;
 
-use App\Events\PasswordResetRequestedEvent;
+use App\Events\Auth\PasswordResetRequestedEvent;
 use App\Models\User;
+use App\Notifications\Auth\UserEmailChangeVerifyNotification;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 
 class AuthService
@@ -117,6 +119,34 @@ class AuthService
         ];
     }
 
+    public function verifyNewEmail(int $id, string $hash)
+    {
+
+        $user = User::query()->where('id', $id)->first();
+        if(!$user->exists) abort('404', 'User not found');
+
+        if($user->pending_email ===  null || !hash_equals(sha1($user->pending_email), $hash) ) {
+            abort(409, 'Invalid verification link');
+        };
+
+         DB::transaction(function() use ($user) {
+
+            $emailInUse = User::query()->where('email', $user->pending_email)->exists();
+
+            if($emailInUse) {
+                abort(409, 'Email already in use');
+            }
+
+            $user->forceFill([
+                'email' => $user->pending_email,
+                'pending_email' => null,
+                'email_verified_at' => now()
+            ]);
+            $user->save();
+
+         });
+    }
+
     public function resetPassword(array $data)
     {
 
@@ -168,5 +198,13 @@ class AuthService
         $user->save();
 
         event(new PasswordReset($user)); //TODO: make the email sent after the password is changed by an authenticated user
+    }
+
+    public function changeEmail(User $user, string $email)
+    {
+        $user->pending_email = $email;
+        $user->save();
+
+        Notification::route('mail', $user->pending_email)->notify(new UserEmailChangeVerifyNotification($user));
     }
 }

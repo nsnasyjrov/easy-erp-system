@@ -12,6 +12,9 @@ Route::prefix('auth')->group(function () {
     Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verify'])
         ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
+    Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verifyNewEmail'])
+        ->middleware(['signed', 'throttle:6,1'])->name('email.change.verify');
+
     Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
     Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:6,1');
@@ -31,6 +34,8 @@ Route::prefix('auth')->group(function () {
         Route::patch('password', [AuthController::class, 'changeCurrentPassword'])->middleware('throttle:6,1');
 
         Route::post('verification-notification', [AuthController::class, 'resendVerificationEmail'])->middleware('throttle:6,1');
+
+        Route::patch('email', [AuthController::class, 'changeEmail'])->middleware('throttle:6,1');
     });
 
 });
