@@ -4,6 +4,8 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class ChangeEmailUserRequest extends FormRequest
 {
@@ -23,7 +25,22 @@ class ChangeEmailUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email']
+            'current_email' => ['required', 'string', 'email'],
+            'pending_email' => ['required', 'string', 'email', Rule::unique('users', 'email')],
+            'password' => ['required', 'string', 'current_password'],
         ];
+    }
+
+    public function withValidator($validator)
+    {
+
+        $validator->after(function($validator) {
+            if(empty($this->current_email)) return;
+
+            if($this->current_email != Auth::user()->email) {
+                $validator->errors()->add('current_email', 'The current mail specified is incorrect.');
+            }
+        });
+
     }
 }

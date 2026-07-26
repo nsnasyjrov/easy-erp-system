@@ -9,7 +9,7 @@ Route::prefix('auth')->group(function () {
 
     Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
-    Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verify'])
+    Route::get('email/change/verify/{id}/{hash}', [AuthController::class, 'verify'])
         ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
     Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verifyNewEmail'])
