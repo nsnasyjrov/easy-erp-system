@@ -123,8 +123,7 @@ class AuthService
     public function verifyNewEmail(int $id, string $hash)
     {
 
-        $user = User::query()->where('id', $id)->first();
-        if(!$user->exists) abort('404', 'User not found');
+        $user = User::query()->findOrFail($id);
 
         if($user->pending_email ===  null || !hash_equals(sha1($user->pending_email), $hash) ) {
             abort(409, 'Invalid verification link');

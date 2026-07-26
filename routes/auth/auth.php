@@ -15,7 +15,7 @@ Route::prefix('auth')->group(function () {
     Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verifyNewEmail'])
         ->middleware(['signed', 'throttle:6,1'])->name('email.change.verify');
 
-    Route::post('reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:6,1');
 
     Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:6,1');
 

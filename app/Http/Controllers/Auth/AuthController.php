@@ -156,8 +156,8 @@ class AuthController extends Controller
 
         $this->service->verifyNewEmail($id, $hash);
 
-        return response()->json([
-            'Email successfully verified and changed', 200
+        return response()->json(['status' => 'success',
+            'message' => 'Email successfully verified and changed', 200
         ]);
     }
 
