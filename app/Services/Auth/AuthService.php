@@ -4,6 +4,7 @@ namespace App\Services\Auth;
 
 use App\Events\Auth\PasswordResetRequestedEvent;
 use App\Models\User;
+use App\Notifications\Auth\UserEmailChangeConveyNotification;
 use App\Notifications\Auth\UserEmailChangeVerifyNotification;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
@@ -175,7 +176,6 @@ class AuthService
             $code = 200;
 
         } else {
-            $user->markEmailAsVerified();
 
             event(new Verified($user));
 
@@ -206,5 +206,6 @@ class AuthService
         $user->save();
 
         Notification::route('mail', $user->pending_email)->notify(new UserEmailChangeVerifyNotification($user));
+        $user->notify(new UserEmailChangeConveyNotification());
     }
 }

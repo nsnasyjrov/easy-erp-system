@@ -183,7 +183,7 @@ class AuthController extends Controller
 
     public function resendVerificationEmail(Request $request)
     {
-        $result = $this->service->resendVerificationEmail($request->user);
+        $result = $this->service->resendVerificationEmail($request->user());
 
         return response()->json([
             'status' => $result['status'],
@@ -202,8 +202,9 @@ class AuthController extends Controller
 
     public function changeEmail(ChangeEmailUserRequest $request)
     {
-        $this->service->changeEmail($request->user(), $request->validated('email'));
+        $this->service->changeEmail($request->user(), $request->validated('pending_email'));
 
+        return response()->json(['status' => 'success', 'message' => 'Verification letter sent'], 202);
     }
 
 }
