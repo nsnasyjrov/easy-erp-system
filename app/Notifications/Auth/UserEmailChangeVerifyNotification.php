@@ -41,11 +41,11 @@ class UserEmailChangeVerifyNotification extends Notification
              'hash' => sha1($this->user->pending_email)]);
 
         return (new MailMessage)
-            ->subject('Изменение почты')
-            ->greeting("Привет, " . $this->user->first_name . $this->user->middle_name)
-            ->line("Ты отправил запрос на изменение почты на " . $this->user->pending_email)
-            ->line("Ты можешь подтвердить ее сразу нажав кнопку снизу")
-            ->action('Подтвердить ', $url)
+            ->subject('Change mail')
+            ->greeting("Hello, " . $this->user->first_name . " " . $this->user->middle_name)
+            ->line("You sent a request to change your email to " . $this->user->pending_email)
+            ->line("You can confirm it immediately by clicking the button below")
+            ->action('Confirm ', $url)
             ->salutation('Easy ERP system')
             ->withSymfonyMessage([MailUtils::class, 'attachLogo']);
     }
