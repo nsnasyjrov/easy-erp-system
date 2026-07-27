@@ -157,8 +157,8 @@ class AuthController extends Controller
         $this->service->verifyNewEmail($id, $hash);
 
         return response()->json(['status' => 'success',
-            'message' => 'Email successfully verified and changed', 200
-        ]);
+            'message' => 'Email successfully verified and changed'
+        ], 200);
     }
 
     public function resetPassword(ResetPasswordUserRequest $request)
