@@ -26,7 +26,9 @@ class ChangeEmailUserRequest extends FormRequest
     {
         return [
             'current_email' => ['required', 'string', 'email'],
-            'pending_email' => ['required', 'string', 'email', Rule::unique('users', 'email')],
+            'pending_email' => ['required', 'string', 'email'],
+                               [Rule::unique('users', 'email')],
+                               [Rule::unique('users', 'pending_email')],
             'password' => ['required', 'string', 'current_password'],
         ];
     }
