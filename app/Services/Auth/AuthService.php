@@ -180,7 +180,7 @@ class AuthService
             $user->sendEmailVerificationNotification();
 
             $status = 'success';
-            $message ='We sent a verification letter to the post office.';
+            $message ='Your profile has been successfully verified';
             $code = 200;
         }
 
