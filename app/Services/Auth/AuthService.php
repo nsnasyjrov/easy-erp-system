@@ -177,7 +177,7 @@ class AuthService
 
         } else {
 
-            event(new Verified($user));
+            $user->sendEmailVerificationNotification();
 
             $status = 'success';
             $message ='We sent a verification letter to the post office.';
