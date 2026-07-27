@@ -197,7 +197,7 @@ class AuthService
         $user->password = Hash::make($data['password']);
         $user->save();
 
-        event(new PasswordChanged($user)); //TODO: make the email sent after the password is changed by an authenticated user
+        event(new PasswordChanged($user));
     }
 
     public function changeEmail(User $user, string $email)
