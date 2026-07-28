@@ -45,7 +45,7 @@ class EmailVerificationTest extends TestCase
         $this->assertNull($user->fresh()->email_verified_at);
     }
 
-    public function test_verified_user_cannot_receive_verification_letter()
+    public function test_verified_user_cannot_receive_verification_letter(): void
     {
         Notification::fake();
 
@@ -60,6 +60,8 @@ class EmailVerificationTest extends TestCase
             'message' => 'You have already confirmed your email earlier'
         ]);
 
+        Notification::assertNotSentTo($user, VerifyEmail::class);
+
     }
 
     public function test_unauthenticated_user_cannot_send_data()
@@ -69,4 +71,21 @@ class EmailVerificationTest extends TestCase
 
         $request->assertUnauthorized();
     }
+
+    public function test_any_user_has_sent_too_many_requests(): void
+    {
+
+        $user = User::factory()->create();
+
+        Sanctum::actingAs($user);
+
+        for($i = 0; $i <= 5; $i++) {
+            $this->postJson('api/auth/verification-notification');
+        }
+
+        $request  = $this->postJson('api/auth/verification-notification');
+        $request->assertStatus(429)->assertJson(['message' => 'Too Many Attempts.']);
+
+    }
+
 }
