@@ -38,7 +38,7 @@ class EmailVerificationTest extends TestCase
 
         $response->assertOk()->assertJson([
             'status' => 'success',
-            'message' => 'Your profile has been successfully verified'
+            'message' => 'A verification email has been sent to your email.'
         ]);
 
         Notification::assertSentTo($user, VerifyEmail::class);
