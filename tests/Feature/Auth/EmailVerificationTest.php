@@ -5,7 +5,6 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -44,5 +43,30 @@ class EmailVerificationTest extends TestCase
         Notification::assertSentTo($user, VerifyEmail::class);
 
         $this->assertNull($user->fresh()->email_verified_at);
+    }
+
+    public function test_verified_user_cannot_receive_verification_letter()
+    {
+        Notification::fake();
+
+        $user = User::factory()->verified()->create();
+
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('api/auth/verification-notification');
+
+        $response->assertOk()->assertJson([
+            'status' => 'warning',
+            'message' => 'You have already confirmed your email earlier'
+        ]);
+
+    }
+
+    public function test_unauthenticated_user_cannot_send_data()
+    {
+
+        $request = $this->postJson('api/auth/verification-notification');
+
+        $request->assertUnauthorized();
     }
 }
