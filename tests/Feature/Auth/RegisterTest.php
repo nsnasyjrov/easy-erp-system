@@ -25,10 +25,8 @@ class RegisterTest extends TestCase
             'middle_name'       => fake()->firstName(),
             'last_name'         => fake()->lastName(),
             'email'             => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
             'password'          => 'strongPassword123',
-            'device_name'       => fake()->colorName(),
-            'remember_token'    => Str::random(10)], $overrides);
+            'device_name'       => fake()->colorName()], $overrides);
     }
 
     public function expectedStructureUser()
