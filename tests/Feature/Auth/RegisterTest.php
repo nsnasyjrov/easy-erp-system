@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -13,34 +14,49 @@ class RegisterTest extends TestCase
 {
     use RefreshDatabase;
 
-    /*
-     * TODO: добавить сценарий проверки наличия письма на почте
-     */
+    private const REGISTER_POINT = 'api/auth/register';
 
-
-    public function validPayload()
+    public function validPayload(array $overrides = [])
     {
 
-        $payload =  User::factory()->definition();
-
-        $payload['device_name'] = fake()->colorName();
-
-        return $payload;
-
+        return array_replace([
+            'login'             => fake()->unique()->userName(),
+            'first_name'        => fake()->firstName(),
+            'middle_name'       => fake()->firstName(),
+            'last_name'         => fake()->lastName(),
+            'email'             => fake()->unique()->safeEmail(),
+            'email_verified_at' => now(),
+            'password'          => 'strongPassword123',
+            'device_name'       => fake()->colorName(),
+            'remember_token'    => Str::random(10)], $overrides);
     }
 
+    public function expectedStructureUser()
+    {
+        return [
+            'status',
+            'user' => [
+                'id'   ,
+                'login',
+                'email' ,
+                'first_name',
+                'middle_name',
+                'last_name',
+                'created_at',
+                'updated_at'
+            ],
+            'token'
+        ];
+    }
 
     public function test_throttle_register_route(): void
     {
-
-        for($i = 0; $i <= 5; $i++) {
-            $this->postJson('api/auth/register');
+        for($i = 0; $i <= 4; $i++) {
+            $this->postJson(self::REGISTER_POINT)->assertUnprocessable();
         }
 
-        $request = $this->postJson('api/auth/register');
-
-        $request->assertStatus(429)->assertJson(['message' => 'Too Many Attempts.']);
-
+        $this->postJson(self::REGISTER_POINT)->assertStatus(429)
+            ->assertTooManyRequests();
     }
 
     public function test_guest_can_register()
@@ -48,9 +64,17 @@ class RegisterTest extends TestCase
 
         $payload = $this->validPayload();
 
-        $request = $this->postJson('api/auth/register', $payload);
+        $request = $this->postJson(self::REGISTER_POINT, $payload);
 
-        $request->assertStatus(201);
+        $request->assertStatus(201)->assertJsonStructure($this->expectedStructureUser())
+            ->assertJsonMissingPath('user.password');
+
+        $user = User::query()->where('email', $payload['email'])->sole();
+
+        $this->assertSame($payload['login'], $user->login);
+        $this->assertTrue(Hash::check($payload['password'], $user->password));
+        $this->assertNotSame($payload['password'], $user->password);
+        $this->assertNull($user->email_verified_at);
 
     }
 
@@ -60,9 +84,9 @@ class RegisterTest extends TestCase
 
         $payload['login'] = null;
 
-        $request = $this->postJson('api/auth/register', $payload);
-
-        $request->assertStatus(422)->assertJson(['message' => 'The login field is required.']);
+        $this->postJson(self::REGISTER_POINT, $payload)->assertUnprocessable()->assertJsonValidationErrors(['login']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_login_str_too_long()
@@ -71,9 +95,9 @@ class RegisterTest extends TestCase
 
         $payload['login'] = Str::random(256);
 
-        $request = $this->postJson('api/auth/register', $payload);
-
-        $request->assertStatus(422)->assertJson(['message' => 'The login field must not be greater than 255 characters.']);
+        $this->postJson(self::REGISTER_POINT, $payload)->assertUnprocessable()->assertJsonValidationErrors(['login']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_login_already_taken()
@@ -82,15 +106,16 @@ class RegisterTest extends TestCase
 
         $payload['login'] = 'uniquelogin';
 
-        $request = $this->postJson('api/auth/register', $payload);
-        $request->assertStatus(201)->assertJson(['status' => 'success']);
+        $this->postJson(self::REGISTER_POINT, $payload)->assertCreated();
 
         $payload = $this->validPayload();
-
         $payload['login'] = 'uniquelogin';
 
-        $request = $this->postJson('api/auth/register', $payload);
-        $request->assertStatus(422)->assertJson(['message' => 'The login has already been taken.']);
+        $this->postJson(self::REGISTER_POINT, $payload)
+            ->assertUnprocessable()->assertJsonValidationErrors(['login']);
+
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 1);
     }
 
     public function test_user_cannot_register_first_name_missed()
@@ -99,9 +124,11 @@ class RegisterTest extends TestCase
 
         $payload['first_name'] = null;
 
-        $request = $this->postJson('api/auth/register', $payload);
+        $this->postJson(self::REGISTER_POINT, $payload)
+        ->assertUnprocessable()->assertJsonValidationErrors(['first_name']);
 
-        $request->assertStatus(422)->assertJson(['message' => 'The first name field is required.']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_first_name_str_too_long()
@@ -110,9 +137,11 @@ class RegisterTest extends TestCase
 
         $payload['first_name'] = Str::random(256);
 
-        $request = $this->postJson('api/auth/register', $payload);
+        $this->postJson(self::REGISTER_POINT, $payload)
+            ->assertUnprocessable()->assertJsonValidationErrors(['first_name']);
 
-        $request->assertStatus(422)->assertJson(['message' => 'The first name field must not be greater than 255 characters.']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_middle_name_missed()
@@ -121,9 +150,11 @@ class RegisterTest extends TestCase
 
         $payload['middle_name'] = null;
 
-        $request = $this->postJson('api/auth/register', $payload);
+        $this->postJson(self::REGISTER_POINT, $payload)
+            ->assertUnprocessable()->assertJsonValidationErrors(['middle_name']);
 
-        $request->assertStatus(422)->assertJson(['message' => 'The middle name field is required.']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_middle_name_str_too_long()
@@ -132,9 +163,11 @@ class RegisterTest extends TestCase
 
         $payload['middle_name'] = Str::random(256);
 
-        $request = $this->postJson('api/auth/register', $payload);
+        $this->postJson(self::REGISTER_POINT, $payload)
+        ->assertUnprocessable()->assertJsonValidationErrors(['middle_name']);
 
-        $request->assertStatus(422)->assertJson(['message' => 'The middle name field must not be greater than 255 characters.']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_last_name_missed()
@@ -143,9 +176,11 @@ class RegisterTest extends TestCase
 
         $payload['last_name'] = null;
 
-        $request = $this->postJson('api/auth/register', $payload);
+        $this->postJson(self::REGISTER_POINT, $payload)
+        ->assertUnprocessable()->assertJsonValidationErrors(['last_name']);
 
-        $request->assertStatus(422)->assertJson(['message' => 'The last name field is required.']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_last_name_str_too_long()
@@ -154,9 +189,11 @@ class RegisterTest extends TestCase
 
         $payload['last_name'] = Str::random(256);
 
-        $request = $this->postJson('api/auth/register', $payload);
+        $this->postJson(self::REGISTER_POINT, $payload)
+        ->assertUnprocessable()->assertJsonValidationErrors(['last_name']);
 
-        $request->assertStatus(422)->assertJson(['message' => 'The last name field must not be greater than 255 characters.']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_email_missed()
@@ -165,9 +202,11 @@ class RegisterTest extends TestCase
 
         $payload['email'] = null;
 
-        $request = $this->postJson('api/auth/register', $payload);
+        $this->postJson(self::REGISTER_POINT, $payload)
+            ->assertUnprocessable()->assertJsonValidationErrors(['email']);
 
-        $request->assertStatus(422)->assertJson(['message' => 'The email field is required.']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_email_invalid()
@@ -176,9 +215,11 @@ class RegisterTest extends TestCase
 
         $payload['email'] = 'invalidEmail';
 
-        $request = $this->postJson('api/auth/register', $payload);
+        $this->postJson(self::REGISTER_POINT, $payload)
+            ->assertUnprocessable()->assertJsonValidationErrors(['email']);
 
-        $request->assertStatus(422)->assertJson(['message' => 'The email field must be a valid email address.']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_email_already_taken()
@@ -187,15 +228,16 @@ class RegisterTest extends TestCase
 
         $payload['email'] = 'uniqueemail@gmail.com';
 
-        $request = $this->postJson('api/auth/register', $payload);
-        $request->assertStatus(201)->assertJson(['status' => 'success']);
+        $this->postJson(self::REGISTER_POINT, $payload)->assertCreated();
 
         $payload = $this->validPayload();
 
         $payload['email'] = 'uniqueemail@gmail.com';
 
-        $request = $this->postJson('api/auth/register', $payload);
-        $request->assertStatus(422)->assertJson(['message' => 'The email has already been taken.']);
+        $this->postJson(self::REGISTER_POINT, $payload)->assertUnprocessable()->assertJsonValidationErrors(['email']);
+
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 1);
     }
 
     public function test_user_cannot_register_password_missed()
@@ -204,20 +246,24 @@ class RegisterTest extends TestCase
 
         $payload['password'] = null;
 
-        $request = $this->postJson('api/auth/register', $payload);
+        $this->postJson(self::REGISTER_POINT, $payload)
+            ->assertUnprocessable()->assertJsonValidationErrors(['password']);
 
-        $request->assertStatus(422)->assertJson(['message' => 'The password field is required.']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_password_short()
     {
         $payload = $this->validPayload();
 
-        $payload['password'] = '1234';
+        $payload['password'] = '1234567';
 
-        $request = $this->postJson('api/auth/register', $payload);
+        $this->postJson(self::REGISTER_POINT, $payload)
+            ->assertUnprocessable()->assertJsonValidationErrors(['password']);
 
-        $request->assertStatus(422)->assertJson(['message' => 'The password field must be at least 8 characters.']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_device_name_missed()
@@ -226,9 +272,11 @@ class RegisterTest extends TestCase
 
         $payload['device_name'] = null;
 
-        $request = $this->postJson('api/auth/register', $payload);
+        $this->postJson(self::REGISTER_POINT, $payload)
+            ->assertUnprocessable()->assertJsonValidationErrors(['device_name']);
 
-        $request->assertStatus(422)->assertJson(['message' => 'The device name field is required.']);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_redirected_to_profile_when_authenticated()
@@ -237,7 +285,7 @@ class RegisterTest extends TestCase
         $payload = $this->validPayload();
 
         $request = $this->withToken($user->createToken('test-token')->plainTextToken)
-            ->postJson('api/auth/register', $payload);
+            ->postJson(self::REGISTER_POINT, $payload);
 
         $request->assertStatus(200)->assertJson(['message' => 'You are already logged in']);
 
@@ -245,18 +293,16 @@ class RegisterTest extends TestCase
 
     public function test_user_get_verification_mail_after_success_register()
     {
-//        Notification::fake();
-//
-//        $payload = $this->validPayload();
-//
-//        $request = $this->postJson('api/auth/register', $payload);
-//
-//        $request->assertStatus(201);
-//
-//        unset($payload['device_name']);
-//        $user = USer::factory()->create($payload);
-//
-//        Notification::assertSentTo($user, VerifyEmail::class);
+        Notification::fake();
 
+        $payload = $this->validPayload();
+
+        $this->postJson(self::REGISTER_POINT, $payload)->assertCreated();
+
+        $user = User::query()->where('email', $payload['email'])->sole();
+
+        Notification::assertSentTo($user, VerifyEmail::class);
+
+        $this->assertNull($user->email_verified_at);
     }
 }
