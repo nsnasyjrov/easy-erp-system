@@ -41,8 +41,8 @@ class AuthController extends Controller
         event(new Registered($result['user']));
 
         return response()->json(['status' => 'success',
-                                 'user' => new UserResource($result['user']),
-                                 'token' => $result['token']], 201);
+            'user' => new UserResource($result['user']),
+            'token' => $result['token']], 201);
     }
 
     public function profile(Request $request)
@@ -188,7 +188,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => $result['status'],
             'message' => $result['message'],
-             ], $result['code']);
+        ], $result['code']);
     }
 
     public function changeCurrentPassword(ChangeCurrentPasswordUserRequest $request)

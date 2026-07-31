@@ -130,7 +130,7 @@ class AuthService
             abort(409, 'Invalid verification link');
         };
 
-         DB::transaction(function() use ($user) {
+        DB::transaction(function() use ($user) {
 
             $emailInUse = User::query()->where('email', $user->pending_email)->exists();
 
@@ -145,7 +145,7 @@ class AuthService
             ]);
             $user->save();
 
-         });
+        });
     }
 
     public function resetPassword(array $data)
