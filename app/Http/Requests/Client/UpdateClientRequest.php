@@ -13,7 +13,6 @@ class UpdateClientRequest extends FormRequest
     public function authorize(): bool
     {
         return True;
-        //return auth()->check(); TODO: когда сделаешь норм. авторизацию снеси сверху и расскоментируй.
 
     }
 
@@ -28,5 +27,16 @@ class UpdateClientRequest extends FormRequest
             'name' => ['nullable', 'string'],
             'appearance_date' => ['nullable', 'date'],
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $allData = $this->all();
+
+        $validator->after(function($validator) use ($allData) {
+           if(empty($allData)) {
+               $validator->errors()->add('', 'No fields are filled in');
+           }
+        });
     }
 }

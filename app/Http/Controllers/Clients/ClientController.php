@@ -50,10 +50,6 @@ class ClientController extends Controller
 
             $validatedData = $request->validated();
 
-            if (empty($validatedData)) {
-                return response()->json(['message' => 'Нет полей для обновления'], 422);
-            }
-
             $result = $this->service->update( $client, $validatedData);
 
             return (new ClientResource($result))->additional(["message" => "Client updated"]);
