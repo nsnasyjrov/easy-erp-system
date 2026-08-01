@@ -87,7 +87,7 @@ class RegisterTest extends TestCase
     {
         $payload = $this->validPayload();
 
-        $payload['login'] = null;
+        unset($payload['login']);
 
         $this->postJson(self::REGISTER_POINT, $payload)->assertUnprocessable()->assertJsonValidationErrors(['login']);
         $this->assertDatabaseCount('users', 0);
@@ -122,7 +122,7 @@ class RegisterTest extends TestCase
     {
         $payload = $this->validPayload();
 
-        $payload['first_name'] = null;
+        unset($payload['first_name']);
 
         $this->postJson(self::REGISTER_POINT, $payload)
         ->assertUnprocessable()->assertJsonValidationErrors(['first_name']);
@@ -148,7 +148,7 @@ class RegisterTest extends TestCase
     {
         $payload = $this->validPayload();
 
-        $payload['middle_name'] = null;
+        unset($payload['middle_name']);
 
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertJsonValidationErrors(['middle_name']);
@@ -174,7 +174,7 @@ class RegisterTest extends TestCase
     {
         $payload = $this->validPayload();
 
-        $payload['last_name'] = null;
+       unset($payload['last_name']);
 
         $this->postJson(self::REGISTER_POINT, $payload)
         ->assertUnprocessable()->assertJsonValidationErrors(['last_name']);
@@ -200,7 +200,7 @@ class RegisterTest extends TestCase
     {
         $payload = $this->validPayload();
 
-        $payload['email'] = null;
+        unset($payload['email']);
 
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertJsonValidationErrors(['email']);
@@ -239,7 +239,7 @@ class RegisterTest extends TestCase
     {
         $payload = $this->validPayload();
 
-        $payload['password'] = null;
+        unset($payload['password']);
 
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertJsonValidationErrors(['password']);
@@ -265,7 +265,7 @@ class RegisterTest extends TestCase
     {
         $payload = $this->validPayload();
 
-        $payload['device_name'] = null;
+        unset($payload['device_name']);
 
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertJsonValidationErrors(['device_name']);
