@@ -132,7 +132,7 @@ class CompanyService
     private function applyHasClientSort($query, array $filters)
     {
 
-        if (empty($filters['has_client'])) {
+        if (!array_key_exists('has_client', $filters)) {
             return;
         }
 
