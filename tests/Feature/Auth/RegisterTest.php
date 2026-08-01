@@ -64,7 +64,9 @@ class RegisterTest extends TestCase
 
         $request = $this->postJson(self::REGISTER_POINT, $payload);
 
-        $request->assertStatus(201)->assertJsonStructure($this->expectedStructureUser())
+        $request->assertCreated()->assertJsonStructure($this->expectedStructureUser())
+            ->assertJsonPath('user.login', $payload['login'])
+            ->assertJsonPath('user.email', $payload['email'])
             ->assertJsonMissingPath('user.password');
 
         $user = User::query()->where('email', $payload['email'])->sole();
@@ -74,6 +76,11 @@ class RegisterTest extends TestCase
         $this->assertNotSame($payload['password'], $user->password);
         $this->assertNull($user->email_verified_at);
 
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 1);
+
+        $this->assertDatabaseHas('personal_access_tokens', ['tokenable_id' => $user->id,
+            'name' => $payload['device_name']]);
     }
 
     public function test_user_cannot_register_login_missed()
