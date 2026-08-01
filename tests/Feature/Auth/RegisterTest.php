@@ -105,22 +105,17 @@ class RegisterTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
-    public function test_user_cannot_register_login_already_taken()
+    public function test_user_cannot_register_login_duplicate()
     {
-        $payload = $this->validPayload();
 
-        $payload['login'] = 'uniquelogin';
+        User::factory()->create([
+            'login' => 'uniqueLogin'
+        ]);
 
-        $this->postJson(self::REGISTER_POINT, $payload)->assertCreated();
-
-        $payload = $this->validPayload();
-        $payload['login'] = 'uniquelogin';
-
-        $this->postJson(self::REGISTER_POINT, $payload)
+        $this->postJson(self::REGISTER_POINT, $this->validPayload(['login' => 'uniqueLogin']))
             ->assertUnprocessable()->assertJsonValidationErrors(['login']);
 
         $this->assertDatabaseCount('users', 1);
-        $this->assertDatabaseCount('personal_access_tokens', 1);
     }
 
     public function test_user_cannot_register_first_name_missed()
@@ -227,22 +222,17 @@ class RegisterTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
-    public function test_user_cannot_register_email_already_taken()
+    public function test_user_cannot_register_email_duplicate()
     {
-        $payload = $this->validPayload();
+        User::factory()->create([
+            'email' => 'uniqueemail@gmail.com'
+        ]);
 
-        $payload['email'] = 'uniqueemail@gmail.com';
-
-        $this->postJson(self::REGISTER_POINT, $payload)->assertCreated();
-
-        $payload = $this->validPayload();
-
-        $payload['email'] = 'uniqueemail@gmail.com';
-
-        $this->postJson(self::REGISTER_POINT, $payload)->assertUnprocessable()->assertJsonValidationErrors(['email']);
+        $this->postJson(self::REGISTER_POINT, $this->validPayload(['email' => 'uniqueemail@gmail.com']))
+            ->assertUnprocessable()->assertJsonValidationErrors(['email']);
 
         $this->assertDatabaseCount('users', 1);
-        $this->assertDatabaseCount('personal_access_tokens', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_password_missed()
@@ -284,7 +274,7 @@ class RegisterTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
-    public function test_user_redirected_to_profile_when_authenticated()
+    public function test_user_cannot_create_another_account()
     {
         $user = User::factory()->create();
         $payload = $this->validPayload();
@@ -294,6 +284,8 @@ class RegisterTest extends TestCase
 
         $request->assertStatus(200)->assertJson(['message' => 'You are already logged in']);
 
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 1);
     }
 
     public function test_user_get_verification_mail_after_success_register()
