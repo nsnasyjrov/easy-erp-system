@@ -31,7 +31,7 @@ class UpdateClientRequest extends FormRequest
 
     public function withValidator($validator)
     {
-        $allData = $this->all();
+        $allData = $this->safe()->all();
 
         $validator->after(function($validator) use ($allData) {
            if(empty($allData)) {
