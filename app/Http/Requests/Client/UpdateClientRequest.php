@@ -4,6 +4,7 @@ namespace App\Http\Requests\Client;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class UpdateClientRequest extends FormRequest
 {
@@ -29,14 +30,19 @@ class UpdateClientRequest extends FormRequest
         ];
     }
 
-    public function withValidator($validator)
+    public function after($validator): array
     {
-        $allData = $this->safe()->all();
+        return [
 
-        $validator->after(function($validator) use ($allData) {
-           if(empty($allData)) {
-               $validator->errors()->add('', 'No fields are filled in');
-           }
-        });
+            function (Validator $validator): void {
+                if($validator->errors()->isNotEmpty()) {
+                    return;
+                }
+
+                if($validator->safe()->all() === []) {
+                    $validator->errors()->add('request', 'At least one field must be provided for update.');
+                }
+            }
+        ];
     }
 }
