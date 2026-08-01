@@ -2,7 +2,7 @@
 
 namespace App\Listeners\Auth;
 
-use App\Events\Auth\PasswordChanged;
+use App\Events\Auth\PasswordChangedEvent;
 use App\Notifications\Auth\UserPasswordChangedNotification;
 
 class SendPasswordChangeListener
@@ -18,7 +18,7 @@ class SendPasswordChangeListener
     /**
      * Handle the event.
      */
-    public function handle(PasswordChanged $event): void
+    public function handle(PasswordChangedEvent $event): void
     {
         $event->user->notify(new UserPasswordChangedNotification());
     }

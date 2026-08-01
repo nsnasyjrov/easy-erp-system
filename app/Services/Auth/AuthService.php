@@ -2,7 +2,7 @@
 
 namespace App\Services\Auth;
 
-use App\Events\Auth\PasswordChanged;
+use App\Events\Auth\PasswordChangedEvent;
 use App\Events\Auth\PasswordResetRequestedEvent;
 use App\Models\User;
 use App\Notifications\Auth\UserEmailChangeConveyNotification;
@@ -197,7 +197,7 @@ class AuthService
         $user->password = Hash::make($data['password']);
         $user->save();
 
-        event(new PasswordChanged($user));
+        event(new PasswordChangedEvent($user));
     }
 
     public function changeEmail(User $user, string $email)
