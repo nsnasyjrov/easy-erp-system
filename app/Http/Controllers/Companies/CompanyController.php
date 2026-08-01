@@ -94,9 +94,7 @@ class   CompanyController extends Controller
     public function destroy(Company $company): Response
     {
 
-        if ($company->client()->exists()) abort(409, 'Company is linked to client and cannot be deleted');
-
-        $company->delete();
+        $this->service->deleteCompany($company);
 
         return response()->noContent();
 

@@ -146,4 +146,11 @@ class CompanyService
 
     }
 
+    public function deleteCompany(Company $company)
+    {
+        if ($company->client()->exists()) abort(409, 'Company is linked to client and cannot be deleted');
+
+        $company->delete();
+    }
+
 }
