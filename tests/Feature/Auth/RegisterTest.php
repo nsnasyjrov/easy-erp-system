@@ -9,11 +9,23 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class RegisterTest extends TestCase
 {
     use RefreshDatabase;
+
+    public static function requiredFieldsProvider(): iterable
+    {
+        yield 'login is required' => ['login'];
+        yield 'first_name is required' => ['first_name'];
+        yield 'middle_name is required' => ['middle_name'];
+        yield 'last_name is required' => ['last_name'];
+        yield 'email is required' => ['email'];
+        yield 'password is required' => ['password'];
+        yield 'device_name is required' => ['device_name'];
+    }
 
     private const REGISTER_POINT = 'api/auth/register';
 
@@ -84,17 +96,6 @@ class RegisterTest extends TestCase
             'name' => $payload['device_name']]);
     }
 
-    public function test_user_cannot_register_login_missed()
-    {
-        $payload = $this->validPayload();
-
-        unset($payload['login']);
-
-        $this->postJson(self::REGISTER_POINT, $payload)->assertUnprocessable()->assertJsonValidationErrors(['login']);
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
-    }
-
     public function test_user_cannot_register_login_str_too_long()
     {
         $payload = $this->validPayload();
@@ -119,19 +120,6 @@ class RegisterTest extends TestCase
         $this->assertDatabaseCount('users', 1);
     }
 
-    public function test_user_cannot_register_first_name_missed()
-    {
-        $payload = $this->validPayload();
-
-        unset($payload['first_name']);
-
-        $this->postJson(self::REGISTER_POINT, $payload)
-        ->assertUnprocessable()->assertJsonValidationErrors(['first_name']);
-
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
-    }
-
     public function test_user_cannot_register_first_name_str_too_long()
     {
         $payload = $this->validPayload();
@@ -140,19 +128,6 @@ class RegisterTest extends TestCase
 
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertJsonValidationErrors(['first_name']);
-
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
-    }
-
-    public function test_user_cannot_register_middle_name_missed()
-    {
-        $payload = $this->validPayload();
-
-        unset($payload['middle_name']);
-
-        $this->postJson(self::REGISTER_POINT, $payload)
-            ->assertUnprocessable()->assertJsonValidationErrors(['middle_name']);
 
         $this->assertDatabaseCount('users', 0);
         $this->assertDatabaseCount('personal_access_tokens', 0);
@@ -171,19 +146,6 @@ class RegisterTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
-    public function test_user_cannot_register_last_name_missed()
-    {
-        $payload = $this->validPayload();
-
-       unset($payload['last_name']);
-
-        $this->postJson(self::REGISTER_POINT, $payload)
-        ->assertUnprocessable()->assertJsonValidationErrors(['last_name']);
-
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
-    }
-
     public function test_user_cannot_register_last_name_str_too_long()
     {
         $payload = $this->validPayload();
@@ -192,19 +154,6 @@ class RegisterTest extends TestCase
 
         $this->postJson(self::REGISTER_POINT, $payload)
         ->assertUnprocessable()->assertJsonValidationErrors(['last_name']);
-
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
-    }
-
-    public function test_user_cannot_register_email_missed()
-    {
-        $payload = $this->validPayload();
-
-        unset($payload['email']);
-
-        $this->postJson(self::REGISTER_POINT, $payload)
-            ->assertUnprocessable()->assertJsonValidationErrors(['email']);
 
         $this->assertDatabaseCount('users', 0);
         $this->assertDatabaseCount('personal_access_tokens', 0);
@@ -236,19 +185,6 @@ class RegisterTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
-    public function test_user_cannot_register_password_missed()
-    {
-        $payload = $this->validPayload();
-
-        unset($payload['password']);
-
-        $this->postJson(self::REGISTER_POINT, $payload)
-            ->assertUnprocessable()->assertJsonValidationErrors(['password']);
-
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
-    }
-
     public function test_user_cannot_register_password_short()
     {
         $payload = $this->validPayload();
@@ -257,19 +193,6 @@ class RegisterTest extends TestCase
 
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertJsonValidationErrors(['password']);
-
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
-    }
-
-    public function test_user_cannot_register_device_name_missed()
-    {
-        $payload = $this->validPayload();
-
-        unset($payload['device_name']);
-
-        $this->postJson(self::REGISTER_POINT, $payload)
-            ->assertUnprocessable()->assertJsonValidationErrors(['device_name']);
 
         $this->assertDatabaseCount('users', 0);
         $this->assertDatabaseCount('personal_access_tokens', 0);
@@ -350,6 +273,18 @@ class RegisterTest extends TestCase
 
     }
 
+    #[DataProvider('requiredFieldsProvider')]
+    public function test_registration_requires_field(string $field): void
+    {
+        $payload = $this->validPayload();
 
+        unset($payload[$field]);
+
+        $this->postJson(self::REGISTER_POINT, $payload)->assertUnprocessable()
+            ->assertOnlyJsonValidationErrors([$field]);
+
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
 
 }
