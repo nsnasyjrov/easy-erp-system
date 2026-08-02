@@ -27,6 +27,14 @@ class RegisterTest extends TestCase
         yield 'device_name is required' => ['device_name'];
     }
 
+    public static function fieldsTooLongProvider(): iterable
+    {
+        yield 'login is required' => ['login'];
+        yield 'first_name is required' => ['first_name'];
+        yield 'middle_name is required' => ['middle_name'];
+        yield 'last_name is required' => ['last_name'];
+    }
+
     private const REGISTER_POINT = 'api/auth/register';
 
     public function validPayload(array $overrides = [])
@@ -96,17 +104,6 @@ class RegisterTest extends TestCase
             'name' => $payload['device_name']]);
     }
 
-    public function test_user_cannot_register_login_str_too_long()
-    {
-        $payload = $this->validPayload();
-
-        $payload['login'] = Str::random(256);
-
-        $this->postJson(self::REGISTER_POINT, $payload)->assertUnprocessable()->assertJsonValidationErrors(['login']);
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
-    }
-
     public function test_user_cannot_register_login_duplicate()
     {
 
@@ -118,45 +115,6 @@ class RegisterTest extends TestCase
             ->assertUnprocessable()->assertJsonValidationErrors(['login']);
 
         $this->assertDatabaseCount('users', 1);
-    }
-
-    public function test_user_cannot_register_first_name_str_too_long()
-    {
-        $payload = $this->validPayload();
-
-        $payload['first_name'] = Str::random(256);
-
-        $this->postJson(self::REGISTER_POINT, $payload)
-            ->assertUnprocessable()->assertJsonValidationErrors(['first_name']);
-
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
-    }
-
-    public function test_user_cannot_register_middle_name_str_too_long()
-    {
-        $payload = $this->validPayload();
-
-        $payload['middle_name'] = Str::random(256);
-
-        $this->postJson(self::REGISTER_POINT, $payload)
-        ->assertUnprocessable()->assertJsonValidationErrors(['middle_name']);
-
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
-    }
-
-    public function test_user_cannot_register_last_name_str_too_long()
-    {
-        $payload = $this->validPayload();
-
-        $payload['last_name'] = Str::random(256);
-
-        $this->postJson(self::REGISTER_POINT, $payload)
-        ->assertUnprocessable()->assertJsonValidationErrors(['last_name']);
-
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_email_invalid()
@@ -282,6 +240,20 @@ class RegisterTest extends TestCase
 
         $this->postJson(self::REGISTER_POINT, $payload)->assertUnprocessable()
             ->assertOnlyJsonValidationErrors([$field]);
+
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
+
+    #[DataProvider('fieldsTooLongProvider')]
+    public function test_registration_fields_too_long(string $field)
+    {
+        $payload = $this->validPayload();
+        $payload[$field] = Str::random(256);
+
+
+        $this->postJson(self::REGISTER_POINT, $payload)
+            ->assertUnprocessable()->assertJsonValidationErrors([$field]);
 
         $this->assertDatabaseCount('users', 0);
         $this->assertDatabaseCount('personal_access_tokens', 0);
