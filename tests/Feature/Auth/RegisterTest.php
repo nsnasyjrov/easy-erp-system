@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
@@ -302,4 +303,53 @@ class RegisterTest extends TestCase
 
         $this->assertNull($user->email_verified_at);
     }
+
+    public function test_user_send_invalid_remember_me()
+    {
+        /**
+         * The logic of the program is that it will receive false if it sent nonsense -
+         * this is a feature of the filter_var method
+         */
+        $this->freezeSecond(function(Carbon $now) {
+            $payload = $this->validPayload(['remember_me' => 'invalid']);
+
+            $this->postJson(self::REGISTER_POINT, $payload)
+                ->assertCreated()->assertJsonStructure($this->expectedStructureUser());
+
+            $this->assertDatabaseCount('users', 1);
+            $this->assertDatabaseCount('personal_access_tokens', 1);
+
+            $user = User::query()->where('email', $payload['email'])->sole();
+
+            $this->assertDatabaseHas('personal_access_tokens', ['tokenable_id' => $user->id,
+                'expires_at' => $now->copy()->addMinutes(2880)->format('Y-m-d H:i:s')]);
+        });
+
+    }
+
+    public function test_user_send_valid_remember_me_true()
+    {
+        /**
+         * The logic of the program is that it will receive false if it sent nonsense -
+         * this is a feature of the filter_var method
+         */
+        $this->freezeSecond(function(Carbon $now) {
+            $payload = $this->validPayload(['remember_me' => 'True']);
+
+            $this->postJson(self::REGISTER_POINT, $payload)
+                ->assertCreated()->assertJsonStructure($this->expectedStructureUser());
+
+            $this->assertDatabaseCount('users', 1);
+            $this->assertDatabaseCount('personal_access_tokens', 1);
+
+            $user = User::query()->where('email', $payload['email'])->sole();
+
+            $this->assertDatabaseHas('personal_access_tokens', ['tokenable_id' => $user->id,
+                'expires_at' => $now->copy()->addMinutes(43200)->format('Y-m-d H:i:s')]);
+        });
+
+    }
+
+
+
 }
