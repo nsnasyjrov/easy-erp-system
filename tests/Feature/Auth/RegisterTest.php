@@ -60,16 +60,7 @@ class RegisterTest extends TestCase
     {
         return [
             'status',
-            'user' => [
-                'id'   ,
-                'login',
-                'email' ,
-                'first_name',
-                'middle_name',
-                'last_name',
-                'created_at',
-                'updated_at'
-            ],
+            'user' => $this->userJsonStructure(),
             'token'
         ];
     }
