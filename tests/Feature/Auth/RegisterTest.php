@@ -94,7 +94,8 @@ class RegisterTest extends TestCase
         $request->assertCreated()->assertJsonStructure($this->expectedStructureUser())
             ->assertJsonPath('user.login', $payload['login'])
             ->assertJsonPath('user.email', $payload['email'])
-            ->assertJsonMissingPath('user.password');
+            ->assertJsonMissingPath('user.password')
+            ->assertJsonPath('status', 'success');
 
         $user = User::query()->where('email', $payload['email'])->sole();
 
@@ -102,6 +103,10 @@ class RegisterTest extends TestCase
         $this->assertTrue(Hash::check($payload['password'], $user->password));
         $this->assertNotSame($payload['password'], $user->password);
         $this->assertNull($user->email_verified_at);
+
+        $token = $request->json('token');
+        $this->assertIsString($token);
+        $this->assertNotSame('', $token);
 
         $this->assertDatabaseCount('users', 1);
         $this->assertDatabaseCount('personal_access_tokens', 1);
@@ -118,9 +123,10 @@ class RegisterTest extends TestCase
         ]);
 
         $this->postJson(self::REGISTER_POINT, $this->validPayload(['login' => 'uniqueLogin']))
-            ->assertUnprocessable()->assertJsonValidationErrors(['login']);
+            ->assertUnprocessable()->assertOnlyJsonValidationErrors(['login']);
 
         $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_cannot_register_email_invalid()
@@ -130,7 +136,7 @@ class RegisterTest extends TestCase
         $payload['email'] = 'invalidEmail';
 
         $this->postJson(self::REGISTER_POINT, $payload)
-            ->assertUnprocessable()->assertJsonValidationErrors(['email']);
+            ->assertUnprocessable()->assertOnlyJsonValidationErrors(['email']);
 
         $this->assertRegistrationNoSideEffects();
     }
