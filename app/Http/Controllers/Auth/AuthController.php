@@ -58,7 +58,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 'warning',
                 'message' => 'You are already logged in',
-                'data' => new UserResource($authenticatedUser)
+                'user' => new UserResource($authenticatedUser)
             ]);
         }
 
@@ -72,7 +72,7 @@ class AuthController extends Controller
         if ($result['success']) {
             $status_code = 200;
         } else {
-            $status_code = 401;
+            $status_code = 409;
         }
 
         return response()->json($data, $status_code);
