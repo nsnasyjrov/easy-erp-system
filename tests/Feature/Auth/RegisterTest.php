@@ -150,8 +150,8 @@ class RegisterTest extends TestCase
         $this->postJson(self::REGISTER_POINT, $this->validPayload(['email' => 'uniqueemail@gmail.com']))
             ->assertUnprocessable()->assertJsonValidationErrors(['email']);
 
-        $this->assertRegistrationNoSideEffects();
-    }
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 0);    }
 
     public function test_user_cannot_register_password_short()
     {
@@ -194,7 +194,7 @@ class RegisterTest extends TestCase
         $this->assertNull($user->email_verified_at);
     }
 
-    public function test_user_send_invalid_remember_me()
+    public function test_unrecognized_remember_me_is_treated_as_false()
     {
         /**
          * The logic of the program is that it will receive false if it sent nonsense -
@@ -257,7 +257,7 @@ class RegisterTest extends TestCase
     public function test_registration_max_255_long(string $field): void
     {
         $payload = $this->validPayload();
-        $payload[$field] = str_repeat(256, 'a');
+        $payload[$field] = str_repeat('a', 256);
 
 
         $this->postJson(self::REGISTER_POINT, $payload)
