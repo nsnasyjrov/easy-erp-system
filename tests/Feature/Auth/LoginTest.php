@@ -3,12 +3,13 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use Auth\GeneralAuthTest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
-class LoginTest extends TestCase
+class LoginTest extends GeneralAuthTest
 {
 
     Use RefreshDatabase;
@@ -44,6 +45,8 @@ class LoginTest extends TestCase
 
         $this->postJson(self::LOGIN_ENDPOINT, $this->validPayload())
             ->assertJsonPath('status', 'warning')->assertJsonStructure($this->expectedStructureUser());
+
+        $
     }
 
 }
