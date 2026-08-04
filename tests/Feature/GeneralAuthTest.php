@@ -1,16 +1,16 @@
 <?php
 
-namespace Auth;
+namespace Tests\Feature;
 
-use Tests\Feature\ExampleTest;
+use Tests\TestCase;
 
-class GeneralAuthTest extends ExampleTest
+class GeneralAuthTest extends TestCase
 {
     public function userJsonStructure(): array
     {
         return [
             'user' =>
-                'id'   ,
+            'id'   ,
             'login',
             'email' ,
             'first_name',
