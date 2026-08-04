@@ -36,12 +36,6 @@ class RegisterTest extends GeneralAuthTest
 
     private const REGISTER_POINT = 'api/auth/register';
 
-    public function assertRegistrationNoSideEffects()
-    {
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
-    }
-
     public function validPayload(array $overrides = [])
     {
 
@@ -128,7 +122,7 @@ class RegisterTest extends GeneralAuthTest
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertOnlyJsonValidationErrors(['email']);
 
-        $this->assertRegistrationNoSideEffects();
+        $this->assertNoSideEffects();
     }
 
     public function test_user_cannot_register_email_duplicate()
@@ -152,7 +146,7 @@ class RegisterTest extends GeneralAuthTest
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertJsonValidationErrors(['password']);
 
-        $this->assertRegistrationNoSideEffects();
+        $this->assertNoSideEffects();
     }
 
     public function test_user_cannot_create_another_account()
@@ -240,7 +234,7 @@ class RegisterTest extends GeneralAuthTest
         $this->postJson(self::REGISTER_POINT, $payload)->assertUnprocessable()
             ->assertOnlyJsonValidationErrors([$field]);
 
-        $this->assertRegistrationNoSideEffects();
+        $this->assertNoSideEffects();
     }
 
     #[DataProvider('fieldsTooLongProvider')]
@@ -253,7 +247,7 @@ class RegisterTest extends GeneralAuthTest
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertOnlyJsonValidationErrors([$field]);
 
-        $this->assertRegistrationNoSideEffects();
+        $this->assertNoSideEffects();
     }
 
 }

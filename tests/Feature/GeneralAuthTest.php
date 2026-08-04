@@ -20,4 +20,10 @@ class GeneralAuthTest extends TestCase
             'updated_at'
         ];
     }
+
+    public function assertNoSideEffects()
+    {
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
 }

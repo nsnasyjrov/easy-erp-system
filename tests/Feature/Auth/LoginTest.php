@@ -43,6 +43,21 @@ class LoginTest extends GeneralAuthTest
 
         $this->postJson(self::LOGIN_ENDPOINT, $this->validPayload())
             ->assertJsonPath('status', 'warning')->assertJsonStructure($this->expectedStructureUser());
+
+        /**There is only one user in the database */
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
+
+    public function user_cannot_login_wrong_password(): void
+    {
+
+
+
+    }
+
+
+
+
 
 }
