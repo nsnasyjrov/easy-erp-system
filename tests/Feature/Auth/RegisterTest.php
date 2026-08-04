@@ -29,13 +29,19 @@ class RegisterTest extends TestCase
 
     public static function fieldsTooLongProvider(): iterable
     {
-        yield 'login is required' => ['login'];
-        yield 'first_name is required' => ['first_name'];
-        yield 'middle_name is required' => ['middle_name'];
-        yield 'last_name is required' => ['last_name'];
+        yield 'login exceeds maximum length' => ['login'];
+        yield 'first name exceeds maximum length' => ['first_name'];
+        yield 'middle name exceeds maximum length' => ['middle_name'];
+        yield 'last name exceeds maximum length' => ['last_name'];
     }
 
     private const REGISTER_POINT = 'api/auth/register';
+
+    public function assertRegistrationNoSideEffects()
+    {
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
 
     public function validPayload(array $overrides = [])
     {
@@ -126,8 +132,7 @@ class RegisterTest extends TestCase
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertJsonValidationErrors(['email']);
 
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->assertRegistrationNoSideEffects();
     }
 
     public function test_user_cannot_register_email_duplicate()
@@ -139,8 +144,7 @@ class RegisterTest extends TestCase
         $this->postJson(self::REGISTER_POINT, $this->validPayload(['email' => 'uniqueemail@gmail.com']))
             ->assertUnprocessable()->assertJsonValidationErrors(['email']);
 
-        $this->assertDatabaseCount('users', 1);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->assertRegistrationNoSideEffects();
     }
 
     public function test_user_cannot_register_password_short()
@@ -152,8 +156,7 @@ class RegisterTest extends TestCase
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertJsonValidationErrors(['password']);
 
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->assertRegistrationNoSideEffects();
     }
 
     public function test_user_cannot_create_another_account()
@@ -241,22 +244,20 @@ class RegisterTest extends TestCase
         $this->postJson(self::REGISTER_POINT, $payload)->assertUnprocessable()
             ->assertOnlyJsonValidationErrors([$field]);
 
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->assertRegistrationNoSideEffects();
     }
 
     #[DataProvider('fieldsTooLongProvider')]
-    public function test_registration_fields_too_long(string $field)
+    public function test_registration_max_255_long(string $field): void
     {
         $payload = $this->validPayload();
-        $payload[$field] = Str::random(256);
+        $payload[$field] = str_repeat(256, 'a');
 
 
         $this->postJson(self::REGISTER_POINT, $payload)
-            ->assertUnprocessable()->assertJsonValidationErrors([$field]);
+            ->assertUnprocessable()->assertOnlyJsonValidationErrors([$field]);
 
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('personal_access_tokens', 0);
+        $this->assertRegistrationNoSideEffects();
     }
 
 }
