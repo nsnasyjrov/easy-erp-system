@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\Feature\AuthTestCase;
 
@@ -32,6 +33,17 @@ class LoginTestCase extends AuthTestCase
         ];
     }
 
+    public function loginJsonStructure(): array
+    {
+        return
+        [
+            'status',
+            'token',
+            'user',
+            'message'
+        ];
+    }
+
     /**
      *  An already authenticated user cannot log in with same token.
      */
@@ -49,15 +61,35 @@ class LoginTestCase extends AuthTestCase
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
-    public function user_cannot_login_wrong_password(): void
+    public function test_user_cannot_login_wrong_password(): void
     {
 
+        $user = User::factory()->create([
+            'email' => 'testuserwithsimplepassword@outlook.com',
+            'password' => '12312333333'
+        ]);
 
+        $payload = [
+            'email' => 'testuserwithsimplepassword@outlook.com',
+            'password' => '12312333333A',
+            'device_name' => 'MSI_CBY'
+        ];
+
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+
+        $this->postJson(self::LOGIN_ENDPOINT, $payload)
+            ->assertConflict()->assertJsonStructure($this->loginJsonStructure())
+            ->assertJsonPath('status', 'warning')
+            ->assertJsonPath('token', null)
+            ->assertJsonPath('user', 'No data')
+            ->assertJsonPath('message', 'Invalid credentials');
+
+        $this->assertFalse(Hash::check($payload['password'], $user->password));
+
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
 
     }
-
-
-
-
 
 }

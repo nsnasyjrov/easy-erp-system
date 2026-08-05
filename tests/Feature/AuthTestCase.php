@@ -20,7 +20,7 @@ abstract class AuthTestCase extends TestCase
         ];
     }
 
-    public function assertNoAccessTokensCreated(): void
+    public function assertNoAccessTokensCreated()
     {
         $this->assertDatabaseCount('users', 0);
         $this->assertDatabaseCount('personal_access_tokens', 0);
