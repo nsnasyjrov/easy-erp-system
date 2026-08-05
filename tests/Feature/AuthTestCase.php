@@ -4,12 +4,11 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 
-class GeneralAuthTest extends TestCase
+abstract class AuthTestCase extends TestCase
 {
     public function userJsonStructure(): array
     {
         return [
-            'user' =>
             'id'   ,
             'login',
             'email' ,
