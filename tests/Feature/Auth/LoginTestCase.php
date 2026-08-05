@@ -5,9 +5,9 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
-use Tests\Feature\GeneralAuthTest;
+use Tests\Feature\AuthTestCase;
 
-class LoginTest extends GeneralAuthTest
+class LoginTestCase extends AuthTestCase
 {
 
     Use RefreshDatabase;
@@ -33,7 +33,7 @@ class LoginTest extends GeneralAuthTest
     }
 
     /**
-     *  The user logs in with a token - it is authenticated.
+     *  An already authenticated user cannot log in with same token.
      */
     public function test_authenticated_user_cannot_login(): void
     {
