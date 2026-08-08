@@ -29,7 +29,8 @@ class IndexIndividualRequest extends FormRequest
             'search' => ['nullable', 'string'],
             'sort' => ['nullable', 'string'],
             'sex' => ['nullable', Rule::enum(Sex::class)],
-            'age' => ['nullable', 'integer', 'min:18', 'max:65'],
+            'min_age' => ['integer', 'min:18', 'max:65'],
+            'max_age' => ['integer', 'min:18', 'max:65'],
             'per_page' => ['nullable', 'integer', 'min: 1', 'max:100']
         ];
     }
@@ -38,14 +39,11 @@ class IndexIndividualRequest extends FormRequest
     {
         $inputtedSex = Sex::tryFrom(mb_strtolower($this->input('sex')));
 
-        if(empty($inputtedSex)) {
-            return;
+        if(!empty($inputtedSex)) {
+            $this->merge([
+                'sex' => $inputtedSex->value
+            ]);
         }
 
-        if(empty($inputtedSex)) abort(422, "An incorrect value was entered");
-
-        $this->merge([
-            'sex' => $inputtedSex->value
-        ]);
     }
 }
