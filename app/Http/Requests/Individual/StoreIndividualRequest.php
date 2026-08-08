@@ -33,4 +33,13 @@ class StoreIndividualRequest extends FormRequest
             'client_id' => ['nullable', 'integer', 'exists:clients,id'],
         ];
     }
+
+    public function prepareForValidation()
+    {
+        $inputtedSex = Sex::tryFrom(mb_strtolower($this->input('sex')));
+
+        $this->merge([
+            'sex' => $inputtedSex->value
+        ]);
+    }
 }
