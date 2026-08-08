@@ -30,7 +30,7 @@ class UpdateClientRequest extends FormRequest
         ];
     }
 
-    public function after($validator): array
+    public function after(): array
     {
         return [
 
