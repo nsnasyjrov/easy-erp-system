@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\Feature\AuthTestCase;
 
-class LoginTestCase extends AuthTestCase
+class LoginTest extends AuthTestCase
 {
 
     Use RefreshDatabase;

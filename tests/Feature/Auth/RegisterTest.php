@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\AuthTestCase;
 
-class RegisterTestCase extends AuthTestCase
+class RegisterTest extends AuthTestCase
 {
     use RefreshDatabase;
 
