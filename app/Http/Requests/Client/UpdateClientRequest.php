@@ -25,8 +25,8 @@ class UpdateClientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['nullable', 'string'],
-            'appearance_date' => ['nullable', 'date'],
+            'name' => ['sometimes', 'string'],
+            'appearance_date' => ['sometimes', 'date'],
         ];
     }
 
