@@ -31,7 +31,7 @@ class StoreIndividualRequest extends FormRequest
             'last_name' => ['nullable', 'string', 'max:255'],
             'sex' => ['required', 'string', Rule::enum(Sex::class)],
             'birth_date' => ['required', 'date-format:Y-m-d'],
-            'client_id' => ['nullable', 'integer', 'exists:clients,id'],
+            'client_id' => ['sometimes', 'integer', 'exists:clients,id'],
         ];
     }
 

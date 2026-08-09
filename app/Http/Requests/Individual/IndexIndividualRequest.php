@@ -31,7 +31,7 @@ class IndexIndividualRequest extends FormRequest
             'sort' => ['nullable', 'string'],
             'sex' => ['nullable', Rule::enum(Sex::class)],
             'min_age' => ['integer', 'min:18', 'max:65'],
-            'max_age' => ['integer', 'min:18', 'max:65'],
+            'max_age' => ['integer', 'min:18', 'max:65', 'gt:min_age'],
             'per_page' => ['nullable', 'integer', 'min: 1', 'max:100']
         ];
     }
