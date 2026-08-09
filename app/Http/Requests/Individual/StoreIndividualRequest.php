@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Individual;
 
 use App\Enums\Sex;
+use App\Utils\IndividualUtils;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -34,12 +35,8 @@ class StoreIndividualRequest extends FormRequest
         ];
     }
 
-    public function prepareForValidation()
+    protected function prepareForValidation()
     {
-        $inputtedSex = Sex::tryFrom(mb_strtolower($this->input('sex')));
-
-        $this->merge([
-            'sex' => $inputtedSex->value
-        ]);
+        IndividualUtils::mergeSex($this);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Individual;
 
 use App\Enums\Sex;
+use App\Utils\IndividualUtils;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -31,5 +32,10 @@ class UpdateIndividualRequest extends FormRequest
             'sex' => ['nullable', Rule::enum(Sex::class)],
             'birth_date' => ['nullable', 'date']
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        IndividualUtils::mergeSex($this);
     }
 }

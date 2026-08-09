@@ -4,6 +4,7 @@ namespace App\Http\Requests\Individual;
 
 use App\Enums\Sex;
 use App\Models\Individual;
+use App\Utils\IndividualUtils;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -37,13 +38,6 @@ class IndexIndividualRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $inputtedSex = Sex::tryFrom(mb_strtolower($this->input('sex')));
-
-        if(!empty($inputtedSex)) {
-            $this->merge([
-                'sex' => $inputtedSex->value
-            ]);
-        }
-
+        IndividualUtils::mergeSex($this);
     }
 }
