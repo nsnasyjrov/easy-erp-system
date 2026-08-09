@@ -12,12 +12,12 @@
 - [x] Определить и исправить контракт возрастного фильтра.
 - [x] добавить игнорирование регистра при отправке поля sex в post individuals 
 - [x] Добавить min_age фильтр
-- [ ] Определить поведение повторного `pending_email`.
-- [ ] Проверить auth-изменения после последних правок.
-- [ ] Запустить `php artisan test`.
-- [ ] Запустить `vendor/bin/pint --test`.
-- [ ] Проверить `php artisan route:list`.
-- [ ] Проверить `php artisan event:list`.
+- [x] Определить поведение повторного `pending_email`.
+- [x] Проверить auth-изменения после последних правок.
+- [x] Запустить `php artisan test`.
+- [x] Запустить `vendor/bin/pint --test`.
+- [x] Проверить `php artisan route:list`.
+- [x] Проверить `php artisan event:list`.
 
 ## P1 — Ответственный менеджер клиента
 
