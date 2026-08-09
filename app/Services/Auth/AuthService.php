@@ -200,9 +200,9 @@ class AuthService
         event(new PasswordChangedEvent($user));
     }
 
-    public function changeEmail(User $user, string $email)
+    public function changeEmail(User $user, string $pendingEmail)
     {
-        $user->pending_email = $email;
+        $user->pending_email = $pendingEmail;
         $user->save();
 
         Notification::route('mail', $user->pending_email)->notify(new UserEmailChangeVerifyNotification($user));
