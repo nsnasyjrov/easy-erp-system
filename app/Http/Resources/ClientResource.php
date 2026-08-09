@@ -17,7 +17,7 @@ class ClientResource extends JsonResource
         return [
             'id' => $this->id,
             'type' => $this->type,
-            'appearance_date' => $this->id,
+            'appearance_date' => $this->appearance_date,
             'created_at' => $this->created_at?->toDayDateTimeString(),
             'updated_at' => $this->updated_at?->toDayDateTimeString(),
             'name' => $this->name,

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['first_name', 'middle_name', 'last_name', 'sex', 'birth_date'])]
+#[Fillable(['first_name', 'middle_name', 'last_name', 'sex', 'birth_date', 'client_id'])]
 class Individual extends Model
 {
 
