@@ -2,14 +2,13 @@
 
 namespace App\Notifications\Auth;
 
-use App\Models\User;
 use App\Utils\MailUtils;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\URL;
 
-class UserEmailChangeVerifyNotification extends Notification
+class UserEmailChangeVerifyNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -17,7 +16,9 @@ class UserEmailChangeVerifyNotification extends Notification
      * Create a new notification instance.
      */
     public function __construct(
-        public User $user
+        public readonly string $newEmail,
+        public readonly string $fullName,
+        public readonly string $verificationUrl
     ){}
 
     /**
@@ -35,30 +36,16 @@ class UserEmailChangeVerifyNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $url = URL::temporarySignedRoute(
-            'email.change.verify', now()->addMinutes(60),
-            ['id' => $this->user,
-             'hash' => sha1($this->user->pending_email)]);
 
         return (new MailMessage)
-            ->subject('Change mail')
-            ->greeting("Hello, " . $this->user->first_name . " " . $this->user->middle_name)
-            ->line("You sent a request to change your email to " . $this->user->pending_email)
+            ->subject('Confirm your new email')
+            ->greeting("Hello, " . $this->fullName)
+            ->line("You sent a request to change your email to " . $this->newEmail)
             ->line("You can confirm it immediately by clicking the button below")
-            ->action('Confirm ', $url)
+            ->action('Confirm ', $this->verificationUrl)
             ->salutation('Easy ERP system')
             ->withSymfonyMessage([MailUtils::class, 'attachLogo']);
+
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
-    {
-        return [
-            //
-        ];
-    }
 }
