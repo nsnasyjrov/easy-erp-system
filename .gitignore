@@ -27,3 +27,5 @@ Homestead.yaml
 Thumbs.db
 TASKS.md
 docs/.obsidian/
+docs/manuals/
+.env.testing
