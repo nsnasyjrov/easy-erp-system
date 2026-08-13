@@ -33,17 +33,4 @@ class ChangeEmailUserRequest extends FormRequest
             'password' => ['required', 'string', 'current_password'],
         ];
     }
-
-    public function withValidator($validator)
-    {
-
-        $validator->after(function($validator) {
-            if(empty($this->current_email)) return;
-
-            if($this->current_email != Auth::user()->email) {
-                $validator->errors()->add('current_email', 'The current mail specified is incorrect.');
-            }
-        });
-
-    }
 }
