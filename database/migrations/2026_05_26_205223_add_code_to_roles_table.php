@@ -15,4 +15,13 @@ return new class extends Migration
             $table->string('code')->unique()->after('id');
         });
     }
+
+    public function down(): void
+    {
+        Schema::table('roles', function (Blueprint $table) {
+            $table->dropColumn('code');
+    });
+
+    }
+
 };
