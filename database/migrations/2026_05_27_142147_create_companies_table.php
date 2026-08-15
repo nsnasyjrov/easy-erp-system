@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('legal_name')->nullable();
             $table->string('legal_address')->nullable();
             $table->string('registration_country')->nullable();
-            $table->foreignId('chief_manager')->constrained('users')->nullable();
+            $table->foreignId('chief_manager')->nullable()->constrained('users');
             $table->string('tin_number')->nullable()->unique();
 
             $table->foreignId('client_id')
