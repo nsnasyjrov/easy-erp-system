@@ -29,6 +29,8 @@ class ClientResource extends JsonResource
             'company' => new CompanyResource($this->whenLoaded('company')),
 
             'individual' => new IndividualResource($this->whenLoaded('individual')),
-        ];
+
+            'responsible_manager' => new UserResource($this->whenLoaded('responsibleManager')
+            )];
     }
 }
