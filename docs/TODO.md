@@ -23,14 +23,15 @@
 
 # F0 (срочные фиксы):
 - [x] перевести phpunit на pgsql(backlog)
-- [ ] автотесты для changeemail-сценария
-- [ ] rollback-миграций
+- [x] автотесты для changeemail-сценария
+- [x] rollback-миграций
+- [ ] Загрузить данные с бэкапа и определиться возможно ли сделать тестовую базу(сейчас есть easyerp_testing и пользователь = используется для PHPUNit - для того, чтобы тестить миграции.)
 
 ## P1 — Ответственный менеджер клиента
 
-- [ ] Добавить `responsible_manager_id` в `clients`.
-- [ ] Добавить внешний ключ с `nullOnDelete()`.
-- [ ] Добавить relations в `Client` и `User`.
+- [x] Добавить `responsible_manager_id` в `clients`.
+- [x] Добавить внешний ключ с `nullOnDelete()`.
+- [x] Добавить relations в `Client` и `User`.
 - [ ] Добавить менеджера в `ClientResource`.
 - [ ] Добавить eager loading для списков.
 - [ ] Обновить factories.
