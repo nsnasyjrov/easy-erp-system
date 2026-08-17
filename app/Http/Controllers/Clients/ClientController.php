@@ -31,7 +31,9 @@ class ClientController extends Controller
 
     public function show(Client $client): ClientResource
     {
-            return (new  ClientResource($client));
+        $client->load('responsibleManager');
+        $client->load('contacts');
+        return (new  ClientResource($client));
     }
 
     public function store(StoreClientRequest $request): JsonResponse
