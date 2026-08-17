@@ -24,6 +24,8 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('clients')->group(functi
 // Add contact data
     Route::post("{client}/contacts", [ClientController::class, 'ensureClientContacts'])->whereNumber('client');
 
+    Route::put('{client}/responsible_manager', [ClientController::class, 'setResponsibleManager'])
+        ->whereNumber('client');
 });
 
 

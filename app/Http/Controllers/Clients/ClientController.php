@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Clients;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\EnsureClientContactsRequest;
 use App\Http\Requests\Client\IndexClientRequest;
+use App\Http\Requests\Client\SetClientResponsibleManager;
 use App\Http\Requests\Client\StoreClientRequest;
 use App\Http\Requests\Client\UpdateClientRequest;
 use App\Http\Resources\ClientResource;
@@ -82,6 +83,11 @@ class ClientController extends Controller
         $contacts = $client->contacts()->get();
 
             return (ContactInfoResource::collection($contacts));
+    }
+
+    public function setResponsibleManager(Client $client, SetClientResponsibleManager $request): JsonResponse
+    {
+        $this->service->setResponsibleManager($client, $request->validated());
     }
 
 }

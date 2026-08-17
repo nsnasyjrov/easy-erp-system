@@ -2,8 +2,10 @@
 
 namespace App\Services\Client;
 
+use App\Enums\RoleCode;
 use App\Models\Client;
 use App\Models\ContactInfo;
+use App\Models\User;
 
 class ClientService
 {
@@ -126,4 +128,19 @@ class ClientService
         $query->where('type', $clientType);
 
     }
+
+    public function setResponsibleManager(Client $client, array $array): Client
+    {
+        $user = User::query()->where('email', $array['email'])->sole();
+
+        if($user->role?->code !== RoleCode::Manager) {
+            abort(422, 'User is not a manager');
+        }
+
+        $client->responsibleManager()->associate($user);
+        $client->save();
+
+        return $client->refresh();
+    }
+
 }
