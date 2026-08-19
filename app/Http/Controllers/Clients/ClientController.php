@@ -87,7 +87,11 @@ class ClientController extends Controller
 
     public function setResponsibleManager(Client $client, SetClientResponsibleManager $request): JsonResponse
     {
-        $this->service->setResponsibleManager($client, $request->validated());
+        $client = $this->service->setResponsibleManager($client, $request->validated());
+
+        return (new ClientResource($client))
+            ->additional(["message" => "Client Manager was set"])
+            ->response();
     }
 
 }
