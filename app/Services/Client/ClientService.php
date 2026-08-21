@@ -133,6 +133,10 @@ class ClientService
     {
         $user = User::query()->where('email', $array['email'])->sole();
 
+        if($client->responsible_manager_id === $user->id) {
+            abort(409, 'The transmitted email must be different from the one in the table');
+        }
+
         if($user->role?->code !== RoleCode::Manager) {
             abort(422, 'User is not a manager');
         }
