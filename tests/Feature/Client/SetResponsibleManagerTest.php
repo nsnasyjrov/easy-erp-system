@@ -64,14 +64,13 @@ class SetResponsibleManagerTest extends TestCase
         return str_replace('{id}', str($id), self::SET_RESPONSIBLE_MANAGER);
     }
 
-    private function assertNoChangesToDatabase(Client $client, $userId)
+    private function assertNoChangesWithResponsibleManager(Client $client, $userId)
     {
-        $this->assertDatabaseMissing('clients', [
+        $this->assertDatabaseHas('clients', [
             'id' => $client->id,
-            'responsible_manager_id' => $userId
+            'responsible_manager_id' => null
         ]);
 
-        $this->assertTrue($client->responsible_manager != $userId);
     }
 
     private function setUserManagerRole($user)
@@ -121,7 +120,7 @@ class SetResponsibleManagerTest extends TestCase
 
         $client->refresh();
 
-        $this->assertNoChangesToDatabase($client, $user->id);
+        $this->assertNoChangesWithResponsibleManager($client, $user->id);
     }
 
     #[DataProvider('invalidEmailFieldProvider')]
@@ -136,7 +135,7 @@ class SetResponsibleManagerTest extends TestCase
         $this->putJson($this->uriEndPoint($client->id), ['email' => $invalidEmail])
             ->assertUnprocessable()->assertOnlyJsonValidationErrors('email');
 
-        $this->assertNoChangesToDatabase($client, $user->id);
+        $this->assertNoChangesWithResponsibleManager($client, $user->id);
     }
 
     public function test_set_manager_with_identical_email_throw_conflict(): void
