@@ -3,7 +3,6 @@
 namespace App\Services\Auth;
 
 use App\Enums\RoleCode;
-use App\Enums\RoleName;
 use App\Events\Auth\PasswordChangedEvent;
 use App\Events\Auth\PasswordResetRequestedEvent;
 use App\Models\Role;

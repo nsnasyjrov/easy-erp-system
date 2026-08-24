@@ -27,16 +27,7 @@ class RoleFactory extends Factory
         ];
     }
 
-    public function manager()
-    {
-        return $this->state(fn () => [
-            'name' => 'Manager',
-            'code' => RoleCode::Manager,
-            'description' => 'default manager',
-            'is_system_role' => False,
 
-        ]);
-    }
 }
 
 
