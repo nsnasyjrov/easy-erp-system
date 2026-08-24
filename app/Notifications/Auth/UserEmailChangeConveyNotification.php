@@ -15,10 +15,10 @@ class UserEmailChangeConveyNotification extends Notification implements ShouldQu
     /**
      * Create a new notification instance.
      */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct(
+        public readonly string $newEmail,
+        public readonly string $fullName,
+    ){}
 
     /**
      * Get the notification's delivery channels.
@@ -36,23 +36,12 @@ class UserEmailChangeConveyNotification extends Notification implements ShouldQu
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Change mail')
-            ->greeting("Hello, " . $notifiable->first_name . " " . $notifiable->middle_name)
-            ->line("You sent a request to change your email to " . $notifiable->pending_email)
-            ->line('You can confirm this at pending_email')
+            ->subject('Email change requested')
+            ->greeting("Hello, " .  $this->fullName)
+            ->line("A request was made to change your email address to {$this->newEmail}")
+            ->line('If you did not make this request, secure your account immediately.')
             ->salutation('Easy ERP system')
             ->withSymfonyMessage([MailUtils::class, 'attachLogo']);
-    }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
-    {
-        return [
-            //
-        ];
     }
 }

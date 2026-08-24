@@ -17,7 +17,7 @@ class ClientResource extends JsonResource
         return [
             'id' => $this->id,
             'type' => $this->type,
-            'appearance_date' => $this->id,
+            'appearance_date' => $this->appearance_date,
             'created_at' => $this->created_at?->toDayDateTimeString(),
             'updated_at' => $this->updated_at?->toDayDateTimeString(),
             'name' => $this->name,
@@ -29,6 +29,8 @@ class ClientResource extends JsonResource
             'company' => new CompanyResource($this->whenLoaded('company')),
 
             'individual' => new IndividualResource($this->whenLoaded('individual')),
-        ];
+
+            'responsible_manager' => new UserResource($this->whenLoaded('responsibleManager')
+            )];
     }
 }

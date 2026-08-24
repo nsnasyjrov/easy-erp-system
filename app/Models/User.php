@@ -50,4 +50,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return trim($fullName);
     }
 
+
+    public function managedClients(): HasMany
+    {
+        return $this->hasMany(Client::class, 'responsible_manager_id');
+    }
+
 }

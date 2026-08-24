@@ -2,8 +2,10 @@
 
 namespace App\Services\Auth;
 
+use App\Enums\RoleCode;
 use App\Events\Auth\PasswordChangedEvent;
 use App\Events\Auth\PasswordResetRequestedEvent;
+use App\Models\Role;
 use App\Models\User;
 use App\Notifications\Auth\UserEmailChangeConveyNotification;
 use App\Notifications\Auth\UserEmailChangeVerifyNotification;
@@ -13,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\URL;
 
 class AuthService
 {
@@ -114,6 +117,10 @@ class AuthService
             $code = 200;
         }
 
+        if ($status === 'success') {
+            $this->appointRole($user, RoleCode::User);
+        }
+
         return [
             'status' => $status,
             'message' => $message,
@@ -144,6 +151,7 @@ class AuthService
                 'email_verified_at' => now()
             ]);
             $user->save();
+
 
         });
     }
@@ -200,12 +208,42 @@ class AuthService
         event(new PasswordChangedEvent($user));
     }
 
-    public function changeEmail(User $user, string $email)
+    public function changeEmail(User $user, string $pendingEmail): void
     {
-        $user->pending_email = $email;
+
+        $oldEmail = $user->email;
+        $fullName = $user->fullName();
+        $userId = $user->id;
+
+        $user->pending_email = $pendingEmail;
         $user->save();
 
-        Notification::route('mail', $user->pending_email)->notify(new UserEmailChangeVerifyNotification($user));
-        $user->notify(new UserEmailChangeConveyNotification());
+        Notification::route('mail', $pendingEmail)
+            ->notify(new UserEmailChangeVerifyNotification(newEmail: $pendingEmail,
+                fullName: $fullName,
+                verificationUrl: $this->verificationUrl($userId, $pendingEmail)));
+
+        Notification::route('mail', $oldEmail)
+            ->notify(new UserEmailChangeConveyNotification(newEmail:$pendingEmail,
+                fullName: $fullName));
+
+    }
+
+    private function verificationUrl(int $userId, string $newEmail): string
+    {
+
+        return URL::temporarySignedRoute('email.change.verify',
+            now()->addMinutes(60),
+            ['id' => $userId, 'hash' => sha1($newEmail)]);
+
+    }
+
+    private function appointRole(User $user, RoleCode $rolecode): void
+    {
+        $role = Role::query()->where('code', '=', $rolecode->value)->sole();
+
+        $user->role()->associate($role);
+        $user->save();
+
     }
 }

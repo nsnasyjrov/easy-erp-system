@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Clients;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\EnsureClientContactsRequest;
 use App\Http\Requests\Client\IndexClientRequest;
+use App\Http\Requests\Client\SetClientResponsibleManager;
 use App\Http\Requests\Client\StoreClientRequest;
 use App\Http\Requests\Client\UpdateClientRequest;
 use App\Http\Resources\ClientResource;
@@ -31,7 +32,9 @@ class ClientController extends Controller
 
     public function show(Client $client): ClientResource
     {
-            return (new  ClientResource($client));
+        $client->load('responsibleManager');
+        $client->load('contacts');
+        return (new  ClientResource($client));
     }
 
     public function store(StoreClientRequest $request): JsonResponse
@@ -80,6 +83,15 @@ class ClientController extends Controller
         $contacts = $client->contacts()->get();
 
             return (ContactInfoResource::collection($contacts));
+    }
+
+    public function setResponsibleManager(Client $client, SetClientResponsibleManager $request): JsonResponse
+    {
+        $client = $this->service->setResponsibleManager($client, $request->validated());
+
+        return (new ClientResource($client))
+            ->additional(["message" => "Client Manager was set"])
+            ->response();
     }
 
 }

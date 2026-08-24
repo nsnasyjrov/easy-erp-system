@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('name');
+        Schema::table('roles', function (Blueprint $table) {
+            $table->dropUnique('roles_name_unique');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('name');
+        Schema::table('roles', function (Blueprint $table) {
+            $table->unique('name');
         });
     }
 };

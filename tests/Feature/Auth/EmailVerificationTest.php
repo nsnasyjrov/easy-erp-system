@@ -7,9 +7,9 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
-use Tests\Feature\GeneralAuthTest;
+use Tests\Feature\AuthTestCase;
 
-class EmailVerificationTest extends GeneralAuthTest
+class EmailVerificationTest extends AuthTestCase
 {
     Use RefreshDatabase;
 

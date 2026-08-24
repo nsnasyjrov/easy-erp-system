@@ -6,10 +6,11 @@ use App\Enums\ClientType;
 use App\Models\Client;
 use App\Models\Individual;
 use Carbon\CarbonImmutable;
-use Carbon\Doctrine\CarbonImmutableType;
 use Illuminate\Support\Facades\DB;
 
+
 class IndividualService
+
 {
 
     public function createIndividual(array $individualData): Individual
@@ -142,13 +143,19 @@ class IndividualService
     private function applyAgeFilter($query, array $filters)
     {
 
-        if(!array_key_exists('age', $filters)) return;
+        $minKeyExists = array_key_exists('min_age', $filters);
+        $maxKeyExists = array_key_exists('max_age', $filters);
+
+        if (! $minKeyExists && ! $maxKeyExists) return;
 
         $currentDay = CarbonImmutable::today();
-        $maxAge = $filters['age'];
 
-        $minBirth = $currentDay->subYears($maxAge);
+        $minAge = ($minKeyExists) ? (int) $filters['min_age'] : config('individuals.age.min');
+        $maxAge = ($maxKeyExists) ? (int) $filters['max_age'] : config('individuals.age.max');
 
-        $query->where('birth_date', '>=', $minBirth);
+        $earliestBirthdate= $currentDay->subYears($maxAge + 1)->addDay();
+        $latestBirthdate = $currentDay->subYears($minAge);
+
+        $query->whereBetween( 'birth_date', [$earliestBirthdate, $latestBirthdate]);
     }
 }

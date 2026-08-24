@@ -9,9 +9,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Tests\Feature\GeneralAuthTest;
+use Tests\Feature\AuthTestCase;
 
-class RegisterTest extends GeneralAuthTest
+class RegisterTest extends AuthTestCase
 {
     use RefreshDatabase;
 
@@ -36,7 +36,7 @@ class RegisterTest extends GeneralAuthTest
 
     private const REGISTER_POINT = 'api/auth/register';
 
-    public function validPayload(array $overrides = [])
+    public function validPayload(array $overrides = []): array
     {
 
         return array_replace([
@@ -49,7 +49,7 @@ class RegisterTest extends GeneralAuthTest
             'device_name'       => fake()->colorName()], $overrides);
     }
 
-    public function expectedStructureUser()
+    public function expectedStructureUser(): array
     {
         return [
             'status',
@@ -68,7 +68,7 @@ class RegisterTest extends GeneralAuthTest
             ->assertTooManyRequests();
     }
 
-    public function test_guest_can_register()
+    public function test_guest_can_register(): void
     {
 
         $payload = $this->validPayload();
@@ -99,7 +99,7 @@ class RegisterTest extends GeneralAuthTest
             'name' => $payload['device_name']]);
     }
 
-    public function test_user_cannot_register_login_duplicate()
+    public function test_user_cannot_register_login_duplicate(): void
     {
 
         User::factory()->create([
@@ -113,7 +113,7 @@ class RegisterTest extends GeneralAuthTest
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
-    public function test_user_cannot_register_email_invalid()
+    public function test_user_cannot_register_email_invalid(): void
     {
         $payload = $this->validPayload();
 
@@ -122,10 +122,10 @@ class RegisterTest extends GeneralAuthTest
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertOnlyJsonValidationErrors(['email']);
 
-        $this->assertNoSideEffects();
+        $this->assertNoAccessTokensCreated();
     }
 
-    public function test_user_cannot_register_email_duplicate()
+    public function test_user_cannot_register_email_duplicate(): void
     {
         User::factory()->create([
             'email' => 'uniqueemail@gmail.com'
@@ -137,7 +137,7 @@ class RegisterTest extends GeneralAuthTest
         $this->assertDatabaseCount('users', 1);
         $this->assertDatabaseCount('personal_access_tokens', 0);    }
 
-    public function test_user_cannot_register_password_short()
+    public function test_user_cannot_register_password_short(): void
     {
         $payload = $this->validPayload();
 
@@ -146,10 +146,10 @@ class RegisterTest extends GeneralAuthTest
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertJsonValidationErrors(['password']);
 
-        $this->assertNoSideEffects();
+        $this->assertNoAccessTokensCreated();
     }
 
-    public function test_user_cannot_create_another_account()
+    public function test_user_cannot_create_another_account(): void
     {
         $user = User::factory()->create();
         $payload = $this->validPayload();
@@ -163,7 +163,7 @@ class RegisterTest extends GeneralAuthTest
         $this->assertDatabaseCount('personal_access_tokens', 1);
     }
 
-    public function test_user_get_verification_mail_after_success_register()
+    public function test_user_get_verification_mail_after_success_register(): void
     {
         Notification::fake();
 
@@ -178,7 +178,7 @@ class RegisterTest extends GeneralAuthTest
         $this->assertNull($user->email_verified_at);
     }
 
-    public function test_unrecognized_remember_me_is_treated_as_false()
+    public function test_unrecognized_remember_me_is_treated_as_false(): void
     {
         /**
          * The logic of the program is that it will receive false if it sent nonsense -
@@ -201,7 +201,7 @@ class RegisterTest extends GeneralAuthTest
 
     }
 
-    public function test_user_send_valid_remember_me_true()
+    public function test_user_send_valid_remember_me_true(): void
     {
         /**
          * The logic of the program is that it will receive false if it sent nonsense -
@@ -234,7 +234,7 @@ class RegisterTest extends GeneralAuthTest
         $this->postJson(self::REGISTER_POINT, $payload)->assertUnprocessable()
             ->assertOnlyJsonValidationErrors([$field]);
 
-        $this->assertNoSideEffects();
+        $this->assertNoAccessTokensCreated();
     }
 
     #[DataProvider('fieldsTooLongProvider')]
@@ -247,7 +247,7 @@ class RegisterTest extends GeneralAuthTest
         $this->postJson(self::REGISTER_POINT, $payload)
             ->assertUnprocessable()->assertOnlyJsonValidationErrors([$field]);
 
-        $this->assertNoSideEffects();
+        $this->assertNoAccessTokensCreated();
     }
 
 }

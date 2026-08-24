@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Individual;
 
 use App\Enums\Sex;
+use App\Utils\IndividualUtils;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -29,8 +30,13 @@ class StoreIndividualRequest extends FormRequest
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['nullable', 'string', 'max:255'],
             'sex' => ['required', 'string', Rule::enum(Sex::class)],
-            'birth_date' => ['nullable', 'date'], // 10.06 сделать обязательным полем.
-            'client_id' => ['nullable', 'integer', 'exists:clients,id'],
+            'birth_date' => ['required', 'date-format:Y-m-d'],
+            'client_id' => ['sometimes', 'integer', 'exists:clients,id'],
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        IndividualUtils::mergeSex($this);
     }
 }

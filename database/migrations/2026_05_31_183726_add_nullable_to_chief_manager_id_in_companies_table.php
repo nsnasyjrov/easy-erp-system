@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('companies', function (Blueprint $table) {
-            $table->integer('chief_manager')->nullable()->change();
+            $table->foreignId('chief_manager')->nullable()->change();
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('companies', function (Blueprint $table) {
-            $table->integer('chief_manager')->change();
+            $table->foreignId('chief_manager')->nullable(false)->change();
         });
     }
 };

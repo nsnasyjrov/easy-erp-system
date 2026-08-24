@@ -4,12 +4,11 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 
-class GeneralAuthTest extends TestCase
+abstract class AuthTestCase extends TestCase
 {
     public function userJsonStructure(): array
     {
         return [
-            'user' =>
             'id'   ,
             'login',
             'email' ,
@@ -21,7 +20,7 @@ class GeneralAuthTest extends TestCase
         ];
     }
 
-    public function assertNoSideEffects()
+    public function assertNoAccessTokensCreated()
     {
         $this->assertDatabaseCount('users', 0);
         $this->assertDatabaseCount('personal_access_tokens', 0);

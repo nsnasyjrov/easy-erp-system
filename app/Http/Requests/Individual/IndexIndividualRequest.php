@@ -4,6 +4,7 @@ namespace App\Http\Requests\Individual;
 
 use App\Enums\Sex;
 use App\Models\Individual;
+use App\Utils\IndividualUtils;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -29,23 +30,14 @@ class IndexIndividualRequest extends FormRequest
             'search' => ['nullable', 'string'],
             'sort' => ['nullable', 'string'],
             'sex' => ['nullable', Rule::enum(Sex::class)],
-            'age' => ['nullable', 'integer', 'min:18', 'max:65'],
+            'min_age' => ['integer', 'min:18', 'max:65'],
+            'max_age' => ['integer', 'min:18', 'max:65', 'gt:min_age'],
             'per_page' => ['nullable', 'integer', 'min: 1', 'max:100']
         ];
     }
 
     protected function prepareForValidation()
     {
-        $inputtedSex = Sex::tryFrom(mb_strtolower($this->input('sex')));
-
-        if(empty($inputtedSex)) {
-            return;
-        }
-
-        if(empty($inputtedSex)) abort(422, "An incorrect value was entered");
-
-        $this->merge([
-            'sex' => $inputtedSex->value
-        ]);
+        IndividualUtils::mergeSex($this);
     }
 }

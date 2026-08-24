@@ -26,3 +26,7 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 TASKS.md
+docs/.obsidian/
+docs/manuals/
+.env.testing
+/resources/views/no.blade.php
