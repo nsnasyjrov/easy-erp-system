@@ -22,17 +22,12 @@ class RoleFactory extends Factory
             'name' => 'default',
             'code' => RoleCode::User,
             'description' => 'default',
+            'is_system_role' => False,
+
         ];
     }
 
-    public function manager()
-    {
-        return $this->state(fn () => [
-            'name' => 'Manager',
-            'code' => RoleCode::Manager,
-            'description' => 'default manager'
-        ]);
-    }
+
 }
 
 

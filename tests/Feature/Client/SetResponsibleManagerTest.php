@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Client;
 
+use App\Enums\RoleCode;
 use App\Models\Client;
 use App\Models\Role;
 use App\Models\User;
@@ -73,10 +74,10 @@ class SetResponsibleManagerTest extends TestCase
 
     }
 
-    private function setUserManagerRole($user)
+    private function setUserManagerRole(User $user): void
     {
-        $role = Role::factory()->manager()->create();
-        $user->role_id = $role->id;
+        $role         = Role::query()->where('code', RoleCode::Manager->value)->sole();
+        $user->role()->associate($role);
         $user->save();
         $user->refresh();
     }
