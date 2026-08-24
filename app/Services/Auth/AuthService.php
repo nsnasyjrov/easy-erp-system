@@ -2,6 +2,7 @@
 
 namespace App\Services\Auth;
 
+use App\Enums\RoleCode;
 use App\Enums\RoleName;
 use App\Events\Auth\PasswordChangedEvent;
 use App\Events\Auth\PasswordResetRequestedEvent;
@@ -118,7 +119,7 @@ class AuthService
         }
 
         if ($status === 'success') {
-            $this->appointRole($user, RoleName::User->value);
+            $this->appointRole($user, RoleCode::User->value);
         }
 
         return [
@@ -152,7 +153,7 @@ class AuthService
             ]);
             $user->save();
 
-            $this->appointRole($user, RoleName::User->value);
+            $this->appointRole($user, RoleCode::User->value);
 
         });
     }
@@ -240,7 +241,7 @@ class AuthService
     }
 
     private function appointRole(User $user, string $role) {
-        $role = Role::query()->where('name', '=', $role)->sole();
+        $role = Role::query()->where('code', '=', $role)->sole();
 
         $user->role()->associate($role);
         $user->save();

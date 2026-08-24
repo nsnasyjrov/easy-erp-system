@@ -37,25 +37,33 @@ return new class extends Migration
               [
                   'code'        => self::ADMIN_CODE,
                   'name'        => self::ADMIN_NAME,
-                  'description' => self::ADMIN_DESCRIPTION
+                  'description' => self::ADMIN_DESCRIPTION,
+                  'is_system_role' => True,
+
               ],
 
               [
                   'code'        => self::MANAGER_CODE,
                   'name'        => self::MANAGER_NAME,
-                  'description' => self::MANAGER_DESCRIPTION
+                  'description' => self::MANAGER_DESCRIPTION,
+                  'is_system_role' => True,
+
               ],
 
               [
                   'code'        => self::EMPLOYEE_CODE,
                   'name'        => self::EMPLOYEE_NAME,
-                  'description' => self::EMPLOYEE_DESCRIPTION
+                  'description' => self::EMPLOYEE_DESCRIPTION,
+                  'is_system_role' => True,
+
               ],
 
               [
                   'code'        => self::USER_CODE,
                   'name'        => self::USER_NAME,
-                  'description' => self::USER_DESCRIPTION
+                  'description' => self::USER_DESCRIPTION,
+                  'is_system_role' => True,
+
               ],
           ],
           ['code'],
@@ -69,9 +77,8 @@ return new class extends Migration
     public function down(): void
     {
         DB::table('roles')
-                 ->whereIn('name', [self::ADMIN_NAME,self::MANAGER_NAME,
-                                    self::EMPLOYEE_NAME, self::USER_NAME,
+                 ->whereIn('code', [self::ADMIN_CODE,self::MANAGER_CODE,
+                                    self::EMPLOYEE_CODE, self::USER_CODE,
                 ])->delete();
-
     }
 };
