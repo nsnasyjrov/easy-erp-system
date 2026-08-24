@@ -67,7 +67,7 @@ return new class extends Migration
               ],
           ],
           ['code'],
-            ['name', 'description'],
+            ['name', 'description', 'is_system_role'],
         );
     }
 
