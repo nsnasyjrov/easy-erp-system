@@ -119,7 +119,7 @@ class AuthService
         }
 
         if ($status === 'success') {
-            $this->appointRole($user, RoleCode::User->value);
+            $this->appointRole($user, RoleCode::User);
         }
 
         return [
@@ -153,7 +153,6 @@ class AuthService
             ]);
             $user->save();
 
-            $this->appointRole($user, RoleCode::User->value);
 
         });
     }
@@ -240,8 +239,9 @@ class AuthService
 
     }
 
-    private function appointRole(User $user, string $role) {
-        $role = Role::query()->where('code', '=', $role)->sole();
+    private function appointRole(User $user, RoleCode $rolecode): void
+    {
+        $role = Role::query()->where('code', '=', $rolecode->value)->sole();
 
         $user->role()->associate($role);
         $user->save();

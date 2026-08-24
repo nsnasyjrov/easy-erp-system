@@ -22,6 +22,8 @@ class RoleFactory extends Factory
             'name' => 'default',
             'code' => RoleCode::User,
             'description' => 'default',
+            'is_system_role' => False,
+
         ];
     }
 
@@ -30,7 +32,9 @@ class RoleFactory extends Factory
         return $this->state(fn () => [
             'name' => 'Manager',
             'code' => RoleCode::Manager,
-            'description' => 'default manager'
+            'description' => 'default manager',
+            'is_system_role' => False,
+
         ]);
     }
 }

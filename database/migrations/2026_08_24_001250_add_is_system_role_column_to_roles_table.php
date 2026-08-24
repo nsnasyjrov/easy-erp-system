@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('roles', function (Blueprint $table) {
-            $table->boolean('is_system_role');
+            $table->boolean('is_system_role')->default(false);
         });
     }
 
