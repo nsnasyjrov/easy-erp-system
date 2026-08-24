@@ -2,8 +2,10 @@
 
 namespace App\Services\Auth;
 
+use App\Enums\RoleName;
 use App\Events\Auth\PasswordChangedEvent;
 use App\Events\Auth\PasswordResetRequestedEvent;
+use App\Models\Role;
 use App\Models\User;
 use App\Notifications\Auth\UserEmailChangeConveyNotification;
 use App\Notifications\Auth\UserEmailChangeVerifyNotification;
@@ -115,6 +117,10 @@ class AuthService
             $code = 200;
         }
 
+        if ($status === 'success') {
+            $this->appointRole($user, RoleName::User->value);
+        }
+
         return [
             'status' => $status,
             'message' => $message,
@@ -145,6 +151,8 @@ class AuthService
                 'email_verified_at' => now()
             ]);
             $user->save();
+
+            $this->appointRole($user, RoleName::User->value);
 
         });
     }
@@ -228,6 +236,14 @@ class AuthService
         return URL::temporarySignedRoute('email.change.verify',
             now()->addMinutes(60),
             ['id' => $userId, 'hash' => sha1($newEmail)]);
+
+    }
+
+    private function appointRole(User $user, string $role) {
+        $role = Role::query()->where('name', '=', $role)->sole();
+
+        $user->role()->associate($role);
+        $user->save();
 
     }
 }
