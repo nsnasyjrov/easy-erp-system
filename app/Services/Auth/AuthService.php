@@ -240,9 +240,11 @@ class AuthService
 
     private function appointRole(User $user, RoleCode $rolecode): void
     {
-        $role = Role::query()->where('code', '=', $rolecode->value)->sole();
+        $code = $rolecode->value;
+        $role = Role::query()->where('code', '=', $code)->sole();
 
         $user->role()->associate($role);
+        $user->role_code = $code;
         $user->save();
 
     }
