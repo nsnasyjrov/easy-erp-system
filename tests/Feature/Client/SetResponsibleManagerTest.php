@@ -61,7 +61,7 @@ class SetResponsibleManagerTest extends TestCase
         return str_replace('{id}', str($id), self::SET_RESPONSIBLE_MANAGER);
     }
 
-    private function assertNoChangesWithResponsibleManager(Client $client, $userId)
+    private function assertNoChangesWithResponsibleManager(Client $client)
     {
         $this->assertDatabaseHas('clients', [
             'id' => $client->id,
@@ -70,9 +70,9 @@ class SetResponsibleManagerTest extends TestCase
 
     }
 
-    private function setRole(User $user, RoleCode $RoleCode): void
+    private function setRole(User $user, RoleCode $roleCode): void
     {
-        $role = Role::query()->where('code', $RoleCode->value)->sole();
+        $role = Role::query()->where('code', $roleCode->value)->sole();
         $user->role()->associate($role);
         $user->save();
         $user->refresh();
@@ -107,7 +107,7 @@ class SetResponsibleManagerTest extends TestCase
         ]);
     }
 
-    public function test_user_cannot_set_manager_does_not_have_manager_role(): void
+    public function test_user_without_role_cannot_assign_manager(): void
     {
 
         $preparedData = $this->arrayUserWithRoleClientCompany();
@@ -118,7 +118,7 @@ class SetResponsibleManagerTest extends TestCase
             ->assertForbidden()->assertJson(['message' => 'This action is unauthorized.']);
         $client->refresh();
 
-        $this->assertNoChangesWithResponsibleManager($client, $user->id);
+        $this->assertNoChangesWithResponsibleManager($client);
     }
 
     #[DataProvider('invalidEmailFieldProvider')]
@@ -133,29 +133,33 @@ class SetResponsibleManagerTest extends TestCase
         $this->putJson($this->uriEndPoint($client->id), ['email' => $invalidEmail])
             ->assertUnprocessable()->assertOnlyJsonValidationErrors('email');
 
-        $this->assertNoChangesWithResponsibleManager($client, $user->id);
+        $this->assertNoChangesWithResponsibleManager($client);
     }
 
     public function test_set_manager_with_identical_email_throw_conflict(): void
     {
         $preparedData = $this->arrayUserWithRoleClientCompany();
 
-        $user = $preparedData['user'];
-        $this->setRole($user, RoleCode::Admin);
+        $admin = $preparedData['user'];
+        $manager = User::factory()->verified()->create();
+
+        $this->setRole($admin, RoleCode::Admin);
+        $this->setRole($manager, RoleCode::Manager);
+
         $client = $preparedData['client'];
 
-        $client->responsibleManager()->associate($user);
+        $client->responsibleManager()->associate($manager);
         $client->save();
 
         $client->refresh();
 
-        $this->putJson($this->uriEndPoint($client->id), ['email' => $user->email])
+        $this->putJson($this->uriEndPoint($client->id), ['email' => $manager->email])
             ->assertConflict()->assertJson(['message' =>
                 'The transmitted email must be different from the one in the table']);
 
         $this->assertDatabaseHas('clients', [
             'id' => $client->id,
-            'responsible_manager_id' => $user->id
+            'responsible_manager_id' => $manager->id
         ]);
     }
 

@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Enums\RoleCode;
 use App\Models\Client;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class ClientPolicy
 {
@@ -27,8 +26,8 @@ class ClientPolicy
      */
     public function view(User $user, Client $client): bool
     {
-        if($user->role?->code === RoleCode::Manager && $user->responsible_manager_id === $user->id) {
-            return True;
+        if($user->role?->code === RoleCode::Manager && $client->responsible_manager_id === $user->id) {
+            return true;
         }
 
         /**
@@ -36,7 +35,7 @@ class ClientPolicy
          * Individual, для Employee видимость нужных ему клиентов.
          */
 
-        return False;
+        return false;
     }
 
     /**
@@ -56,7 +55,7 @@ class ClientPolicy
             return True;
         }
 
-        return False;
+        return false;
     }
 
     /**
@@ -85,6 +84,6 @@ class ClientPolicy
 
     public function assignResponsibleManager(User $user, Client $client): bool
     {
-        return False;
+        return false;
     }
 }
