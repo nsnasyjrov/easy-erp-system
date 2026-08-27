@@ -52,7 +52,7 @@ class ClientPolicy
      */
     public function update(User $user, Client $client): bool
     {
-        if($user->role?->code === RoleCode::Manager && $user->responsible_manager_id === $user->id) {
+        if($user->role?->code === RoleCode::Manager && $client->responsible_manager_id === $user->id) {
             return True;
         }
 

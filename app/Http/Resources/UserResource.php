@@ -25,7 +25,6 @@ class UserResource extends JsonResource
             'last_name' => $this->last_name,
             'created_at' => $this->created_at->ToDateTimeString(),
             'updated_at' => $this->updated_at->ToDateTimeString(),
-            'role_code' => $this->role_code,
 
             // LOAD
 
