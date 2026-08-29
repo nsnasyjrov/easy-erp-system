@@ -109,7 +109,6 @@ class SetResponsibleManagerTest extends TestCase
 
     public function test_user_without_role_cannot_assign_manager(): void
     {
-
         $preparedData = $this->arrayUserWithRoleClientCompany();
         $user = $preparedData['user'];
         $client = $preparedData['client'];
@@ -119,6 +118,20 @@ class SetResponsibleManagerTest extends TestCase
         $client->refresh();
 
         $this->assertNoChangesWithResponsibleManager($client);
+    }
+
+    public function test_manager_cannot_assign_themselves(): void
+    {
+        $preparedData = $this->arrayUserWithRoleClientCompany();
+        $user = $preparedData['user'];
+        $client = $preparedData['client'];
+
+        $this->setRole($user, RoleCode::Manager);
+
+        $this->putJson($this->uriEndPoint($client->id), ['email' => $user->email])->
+            assertForbidden()->assertJson(['message' => 'This action is unauthorized.']);
+
+        $this->assertDatabaseHas('clients', ['id' => $client->id, 'responsible_manager_id' => null]);
     }
 
     #[DataProvider('invalidEmailFieldProvider')]
