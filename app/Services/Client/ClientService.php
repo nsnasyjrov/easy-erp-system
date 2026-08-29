@@ -12,7 +12,14 @@ class ClientService
 
     public function create(array $clientData): Client
     {
-        return Client::create($clientData);
+        $manager = $clientData['responsible_manager'];
+        unset($clientData['responsible_manager']);
+
+        $client = Client::create($clientData);
+        $client->responsibleManager()->associate($manager);
+        $client->save();
+
+        return $client->refresh();
     }
 
 
