@@ -1,31 +1,29 @@
 <?php
 
 use App\Http\Controllers\Clients\ClientController;
+use App\Models\Client;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'verified'])->prefix('clients')->group(function () {
 
-    Route::get('/', [ClientController::class, 'index']);
+    Route::get('/', [ClientController::class, 'index'])->can('viewAny', Client::class);
 
-// Create client entity
-    Route::post('/', [ClientController::class, 'store']);
+    Route::post('/', [ClientController::class, 'store'])->can('create', Client::class);
 
-// Read client entity
-    Route::get('{client}', [ClientController::class, 'show'])->whereNumber('client');
+    Route::get('{client}', [ClientController::class, 'show'])->whereNumber('client')->can('view', 'client');
 
-// Update client entity
-    Route::patch('{client}', [ClientController::class, 'update'])->whereNumber('client');
+    Route::patch('{client}', [ClientController::class, 'update'])->whereNumber('client')->can('update', 'client');
 
-// Delete client entity
-    Route::delete('{client}', [ClientController::class, 'destroy'])->whereNumber('client');
+    Route::delete('{client}', [ClientController::class, 'destroy'])->whereNumber('client')->can('delete', 'client');
 
-//Get contacts
-    Route::get('{client}/contacts', [ClientController::class, 'contacts'])->whereNumber('client');
-// Add contact data
-    Route::post("{client}/contacts", [ClientController::class, 'ensureClientContacts'])->whereNumber('client');
+    Route::get('{client}/contacts', [ClientController::class, 'contacts'])
+        ->whereNumber('client')->can('viewContacts', 'client');
+
+    Route::post("{client}/contacts", [ClientController::class, 'ensureClientContacts'])
+        ->whereNumber('client')->can('createContact', 'client');
 
     Route::put('{client}/responsible_manager', [ClientController::class, 'setResponsibleManager'])
-        ->whereNumber('client')->can('assignResponsibleManager', 'client');
+        ->whereNumber('client')->can('assignResponsibleManager', Client::class);
 });
 
 

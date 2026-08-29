@@ -8,9 +8,9 @@ use App\Models\User;
 
 class ClientPolicy
 {
-    public function before(User $user, string $abilities): ?bool
+    public function before(User $user, string $ability): ?bool
     {
-        return $user->role?->code === RoleCode::Admin? true : null;
+        return $user->role->code === RoleCode::Admin ? true : null;
     }
 
     /**
@@ -19,6 +19,14 @@ class ClientPolicy
     public function viewAny(User $user): bool
     {
         return $user->role?->code === RoleCode::Manager;
+    }
+
+    /**
+     * Determine whether user can view the contacts of a specific client
+     */
+    public function viewContacts(User $user, Client $client): bool
+    {
+        return $user->role?->code === RoleCode::Manager && $client->responsible_manager_id === $user->id;
     }
 
     /**
@@ -44,6 +52,11 @@ class ClientPolicy
     public function create(User $user): bool
     {
         return $user->role?->code === RoleCode::Manager;
+    }
+
+    public function createContact(User $user, Client $client): bool
+    {
+        return $user->role?->code === RoleCode::Manager && $client->responsible_manager_id === $user->id;
     }
 
     /**
