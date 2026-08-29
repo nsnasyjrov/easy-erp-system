@@ -144,8 +144,8 @@ class ClientService
             abort(409, 'The transmitted email must be different from the one in the table');
         }
 
-        if($user->role?->code !== RoleCode::Manager) {
-            abort(422, 'User is not a manager');
+        if(!in_array($user->role?->code, [RoleCode::Manager, RoleCode::Admin])) {
+            abort(422, 'User can\'t be set as responsible manager');
         }
 
         $client->responsibleManager()->associate($user);
