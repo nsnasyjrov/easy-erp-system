@@ -39,8 +39,8 @@ class ClientController extends Controller
 
     public function store(StoreClientRequest $request): JsonResponse
     {
-
             $validatedData = $request->validated();
+            $validatedData['responsible_manager'] = $request->user();
             $result = $this->service->create($validatedData);
 
             return (new ClientResource($result))

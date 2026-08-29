@@ -10,7 +10,7 @@ class ClientPolicy
 {
     public function before(User $user, string $ability): ?bool
     {
-        return $user->role->code === RoleCode::Admin ? true : null;
+        return $user->role?->code === RoleCode::Admin ? true : null;
     }
 
     /**

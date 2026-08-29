@@ -23,7 +23,7 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('clients')->group(functi
         ->whereNumber('client')->can('createContact', 'client');
 
     Route::put('{client}/responsible_manager', [ClientController::class, 'setResponsibleManager'])
-        ->whereNumber('client')->can('assignResponsibleManager', Client::class);
+        ->whereNumber('client')->can('assignResponsibleManager', 'client');
 });
 
 
