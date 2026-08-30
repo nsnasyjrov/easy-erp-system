@@ -158,7 +158,7 @@ class ClientService
 
     private function applyAccessScope(Builder $query, User $user): void
     {
-        $roleCode = $user->role();
+        $roleCode = $user->role()->code;
 
         if($roleCode === RoleCode::Admin) return;
 

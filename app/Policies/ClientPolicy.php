@@ -18,7 +18,7 @@ class ClientPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role?->code === RoleCode::Manager;
+        return (in_array($user->role?->code, [RoleCode::Manager, RoleCode::User, RoleCode::Employee]));
     }
 
     /**
@@ -36,6 +36,10 @@ class ClientPolicy
     {
         if($user->role?->code === RoleCode::Manager && $client->responsible_manager_id === $user->id) {
             return true;
+        }
+
+        if(in_array($user->role?->code, [RoleCode::User, RoleCode::Employee]) && $client->is_public) {
+            return True;
         }
 
         /**
