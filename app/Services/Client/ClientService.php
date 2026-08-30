@@ -6,6 +6,7 @@ use App\Enums\RoleCode;
 use App\Models\Client;
 use App\Models\ContactInfo;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 
 class ClientService
 {
@@ -56,11 +57,12 @@ class ClientService
         return $contact;
     }
 
-    public function getPaginatedList(array $filters)
+    public function getPaginatedList(User $user, array $filters)
     {
 
         $query = Client::query();
 
+        $this->applyAccessScope($query, $user);
         $this->applyQueryFilters($query, $filters);
 
         return $query->paginate($filters['per_page'] ?? 20);
@@ -152,6 +154,20 @@ class ClientService
         $client->save();
 
         return $client->refresh();
+    }
+
+    private function applyAccessScope(Builder $query, User $user): void
+    {
+        $roleCode = $user->role();
+
+        if($roleCode === RoleCode::Admin) return;
+
+        if($roleCode === RoleCode::Manager) {
+            $query->where('responsible_manager_id', $user->id);
+            return;
+        }
+
+        $query->where('is_public', True);
     }
 
 }

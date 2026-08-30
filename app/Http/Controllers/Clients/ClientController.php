@@ -25,7 +25,7 @@ class ClientController extends Controller
 
     public function index(IndexClientRequest $request): AnonymousResourceCollection
     {
-        $clients = $this->service->getPaginatedList($request->validated());
+        $clients = $this->service->getPaginatedList($request->user(), $request->validated());
 
         return (ClientResource::collection($clients));
     }
