@@ -1,18 +1,17 @@
 <?php
 
 use App\Http\Controllers\Clients\ClientController;
-use App\Models\Client;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'verified'])->prefix('clients')->group(function () {
 
-    Route::get('/', [ClientController::class, 'index'])->can('viewAny', Client::class);
+    Route::get('/', [ClientController::class, 'index']);
 
-    Route::post('/', [ClientController::class, 'store'])->can('create', Client::class);
+    Route::post('/', [ClientController::class, 'store']);
 
     Route::get('{client}', [ClientController::class, 'show'])->whereNumber('client')->can('view', 'client');
 
-    Route::patch('{client}', [ClientController::class, 'update'])->whereNumber('client')->can('update', 'client');
+    Route::patch('{client}', [ClientController::class, 'update'])->whereNumber('client');
 
     Route::delete('{client}', [ClientController::class, 'destroy'])->whereNumber('client')->can('delete', 'client');
 
@@ -23,7 +22,7 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('clients')->group(functi
         ->whereNumber('client')->can('createContact', 'client');
 
     Route::put('{client}/responsible_manager', [ClientController::class, 'setResponsibleManager'])
-        ->whereNumber('client')->can('assignResponsibleManager', 'client');
+        ->whereNumber('client');
 });
 
 

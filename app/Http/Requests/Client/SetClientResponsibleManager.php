@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Client;
 
+use App\Models\Client;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,7 @@ class SetClientResponsibleManager extends FormRequest
      */
     public function authorize(): bool
     {
-        return True;
+        return $this->user()->can('assignResponsibleManager', $this->route('client'));
     }
 
     /**

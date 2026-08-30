@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Client;
 
 use App\Enums\ClientType;
+use App\Models\Client;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -14,8 +15,7 @@ class StoreClientRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
-        //return auth()->check(); TODO: когда сделаешь норм. авторизацию снеси сверху и расскоментируй.
+        return $this->user()->can('create', $this->route('client'));
     }
 
     /**

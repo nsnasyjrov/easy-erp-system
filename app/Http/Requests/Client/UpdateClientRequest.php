@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Client;
 
+use App\Models\Client;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
@@ -13,8 +14,7 @@ class UpdateClientRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return True;
-
+        return $this->user()->can('update', $this->route('client'));
     }
 
     /**
