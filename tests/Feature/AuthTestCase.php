@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 abstract class AuthTestCase extends TestCase
@@ -25,4 +27,5 @@ abstract class AuthTestCase extends TestCase
         $this->assertDatabaseCount('users', 0);
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
+
 }

@@ -4,13 +4,12 @@ namespace Tests\Feature\Client;
 
 use App\Enums\RoleCode;
 use App\Models\Client;
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Tests\TestCase;
+use Tests\Feature\ClientTestCase;
 
-class SetResponsibleManagerTest extends TestCase
+class SetResponsibleManagerTestCase extends ClientTestCase
 {
 
     use RefreshDatabase;
@@ -70,13 +69,6 @@ class SetResponsibleManagerTest extends TestCase
 
     }
 
-    private function setRole(User $user, RoleCode $roleCode): void
-    {
-        $role = Role::query()->where('code', $roleCode->value)->sole();
-        $user->role()->associate($role);
-        $user->save();
-        $user->refresh();
-    }
 
     /**
      * Main test methods

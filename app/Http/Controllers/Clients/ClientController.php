@@ -33,7 +33,6 @@ class ClientController extends Controller
     public function show(Client $client): ClientResource
     {
         $client->load('responsibleManager');
-        $client->load('contacts');
         return (new  ClientResource($client));
     }
 

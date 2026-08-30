@@ -10,9 +10,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Tests\TestCase;
+use Tests\Feature\AuthTestCase;
 
-class ChangeEmailTest extends TestCase
+class ChangeEmailTest extends AuthTestCase
 {
     use RefreshDatabase;
 

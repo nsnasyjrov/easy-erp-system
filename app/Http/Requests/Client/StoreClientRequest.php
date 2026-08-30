@@ -15,7 +15,7 @@ class StoreClientRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->can('create', $this->route('client'));
+        return $this->user()->can('create', Client::class);
     }
 
     /**
