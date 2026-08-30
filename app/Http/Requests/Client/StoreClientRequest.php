@@ -28,7 +28,8 @@ class StoreClientRequest extends FormRequest
         return [
             'type' => ['required', Rule::enum(ClientType::class)],
             'name'=> ['required', 'string', 'max:150'],
-            'appearance_date' => ['nullable', 'date']
+            'appearance_date' => ['nullable', 'date'],
+            'is_public' => ['sometimes', 'boolean']
         ];
     }
 }

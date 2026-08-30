@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['name', 'type', 'appearance_date'])]
+#[Fillable(['name', 'type', 'appearance_date', 'is_public'])]
 class Client extends Model
 {
 
