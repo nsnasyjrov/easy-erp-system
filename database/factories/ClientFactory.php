@@ -23,6 +23,7 @@ class ClientFactory extends Factory
             'appearance_date' => fake()->date(),
             'name' => $this->fullName(),
             'responsible_manager_id' => null,
+            'is_public' => false
         ];
     }
 

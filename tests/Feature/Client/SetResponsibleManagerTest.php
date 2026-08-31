@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\ClientTestCase;
 
-class SetResponsibleManagerTestCase extends ClientTestCase
+class SetResponsibleManagerTest extends ClientTestCase
 {
 
     use RefreshDatabase;
@@ -49,7 +49,7 @@ class SetResponsibleManagerTestCase extends ClientTestCase
     private function arrayUserWithRoleClientCompany(): array
     {
         $client = Client::factory()->company()->create();
-        $user = User::factory()->verified()->create();
+        $user = User::factory()->create();
         Sanctum:$this->actingAs($user);
 
         return ['client' => $client, 'user' => $user];
@@ -84,7 +84,7 @@ class SetResponsibleManagerTestCase extends ClientTestCase
         $preparedData = $this->arrayUserWithRoleClientCompany();
 
         $user = $preparedData['user'];
-        $manager = User::factory()->verified()->create();
+        $manager = User::factory()->create();
         $client = $preparedData['client'];
 
         $this->setRole($user, RoleCode::Admin);
@@ -130,7 +130,7 @@ class SetResponsibleManagerTestCase extends ClientTestCase
     public function test_invalid_email_field_provider($invalidEmail): void
     {
         $client = Client::factory()->company()->create();
-        $user = User::factory()->verified()->create();
+        $user = User::factory()->create();
         Sanctum:$this->actingAs($user);
 
         $this->setRole($user, RoleCode::Admin);

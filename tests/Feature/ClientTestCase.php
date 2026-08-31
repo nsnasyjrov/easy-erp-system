@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\RoleCode;
+use App\Models\Client;
 use App\Models\Role;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
@@ -39,13 +40,5 @@ abstract class ClientTestCase extends TestCase
         $user->refresh();
     }
 
-    public function createVerifiedAuthorizedUser(): User
-    {
-        $user = User::factory()->verified()->create();
-
-        Sanctum::actingAs($user);
-
-        return $user;
-    }
 
 }

@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\RoleCode;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -51,4 +53,37 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
         ]);
     }
+
+    private function withRole(RoleCode $roleCode): static
+    {
+        $role = Role::query()->where('code', $roleCode)->sole();
+
+        return $this->for($role, 'role');
+    }
+
+    private function setRole(RoleCode $roleCode): static
+    {
+        return $this->withRole($roleCode);
+    }
+
+    public function admin(): static
+    {
+        return $this->setRole(RoleCode::Admin);
+    }
+
+    public function manager(): static
+    {
+       return $this->setRole(RoleCode::Manager);
+    }
+
+    public function employee(): static
+    {
+        return $this->setRole(RoleCode::Employee);
+    }
+
+    public function user(): static
+    {
+        return $this->setRole(RoleCode::User);
+    }
+
 }

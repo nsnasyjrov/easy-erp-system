@@ -33,7 +33,7 @@ class ChangeEmailTest extends AuthTestCase
 
     private const CHANGE_EMAIL_ENDPOINT = 'api/auth/email';
 
-    public static function pendingEmailMustBeUniqueProvider(): iterable
+        public static function pendingEmailMustBeUniqueProvider(): iterable
     {
         yield 'The email has already been taken' => ['email'];
         yield 'The pending email has already been taken' => ['pending_email'];

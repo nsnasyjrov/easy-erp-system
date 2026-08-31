@@ -4,7 +4,10 @@ namespace Tests\Feature\Client;
 
 use App\Enums\RoleCode;
 use App\Models\Client;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\ClientTestCase;
 
 
@@ -14,37 +17,63 @@ class ClientAuthorizationTest extends ClientTestCase
 
     private const string CLIENTS_INDEX_URL = 'api/clients';
 
-    //test_admin_can_list_all_clients()
-    //test_manager_can_list_only_own_clients()
-    //test_employee_can_list_only_public_clients()
-    //test_user_can_list_only_public_clients()
-
-    /**
-     * helpers++
-     */
-    private function createClientList(int $count)
+    public static function canListOnlyPublic(): iterable
     {
-        for($i = 0; $i < $count; $i++) {
-            Client::factory()->create();
-        }
+        yield 'employee can see only public clients' => [RoleCode::Employee];
+        yield 'user can see only public clients' => [RoleCode::User];
     }
-
-
-    /**
-     * helpers--
-     */
-
-    /**
-     * index
-     */
 
     public function test_admin_can_list_all_clients(): void
     {
-        $this->createClientList(10);
-        $this->setRole($this->createVerifiedAuthorizedUser(), RoleCode::Admin);
+        $admin = User::factory()->admin()->create();
+        Sanctum::actingAs($admin);
+        Client::factory()->count(10);
 
         $this->get(self::CLIENTS_INDEX_URL)->assertOk()->assertJsonStructure($this->clientsExpectedJsonStructure());
+    }
 
+    public function test_manager_can_list_only_own_clients(): void
+    {
+        $manager = User::factory()->manager()->create();
+        $ownClients = Client::factory()->count(10)->for($manager, 'responsibleManager')->create();
+        $exceptionClient = Client::factory()->create();
+
+        Sanctum::actingAs($manager);
+
+        $response = $this->get(self::CLIENTS_INDEX_URL)->assertOk()->assertJsonCount(10, 'data')
+            ->assertJsonMissing(['id' => $exceptionClient->id]);
+
+        foreach($ownClients as $client) {
+            $response->assertJsonFragment([
+                'id' => $client->id
+            ]);
+        }
+    }
+
+    #[DataProvider('canListOnlyPublic')]
+    public function test_can_list_only_public(RoleCode $roleCode): void
+    {
+        $publicClients = Client::factory(['is_public' => true])->count(10)->create();
+        $exceptionClient = Client::factory()->create();
+
+        if ($roleCode === RoleCode::Employee) {
+            $user = User::factory()->employee()->create();
+        } elseif ($roleCode === RoleCode::User) {
+            $user = User::factory()->user()->create();
+        } else {
+            return;
+        }
+
+        Sanctum::actingAs($user);
+
+        $response = $this->get(self::CLIENTS_INDEX_URL)->assertOk()->assertJsonCount(10, 'data')
+            ->assertJsonMissing(['id' => $exceptionClient->id]);
+
+        foreach ($publicClients as $client) {
+            $response->assertJsonFragment([
+                'id' => $client->id
+            ]);
+        }
     }
 
 }
