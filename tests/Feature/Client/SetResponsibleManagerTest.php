@@ -21,30 +21,6 @@ class SetResponsibleManagerTest extends ClientTestCase
     /**
      * Helping methods
      */
-    private function expectedJsonStructure()
-    {
-        return [
-
-            'data' => [
-                'id',
-                'type',
-                'appearance_date',
-                'created_at',
-                'updated_at',
-                'name',
-                'responsible_manager' => [
-                        'id'   ,
-                        'login',
-                        'email' ,
-                        'first_name',
-                        'middle_name',
-                        'last_name',
-                        'created_at',
-                        'updated_at'
-                ]
-            ]
-        ];
-    }
 
     private function arrayUserWithRoleClientCompany(): array
     {
@@ -91,7 +67,7 @@ class SetResponsibleManagerTest extends ClientTestCase
         $this->setRole($manager, RoleCode::Manager);
 
         $this->putJson($this->uriEndPoint($client->id), ['email' => $manager->email])->assertOk()->
-        assertJsonStructure($this->expectedJsonStructure());
+        assertJsonStructure($this->expectedClientJsonStructure());
 
         $this->assertDatabaseHas('clients', [
             'id' => $client->id,
