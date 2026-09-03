@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\ClientTestCase;
 
@@ -32,6 +33,7 @@ class ClientAuthorizationTest extends ClientTestCase
         $this->get(self::CLIENTS_INDEX_URL)->assertOk()->assertJsonStructure($this->clientsExpectedJsonStructure());
     }
 
+
     public function test_manager_can_list_only_own_clients(): void
     {
         $manager = User::factory()->manager()->create();
@@ -56,13 +58,11 @@ class ClientAuthorizationTest extends ClientTestCase
         $publicClients = Client::factory(['is_public' => true])->count(10)->create();
         $exceptionClient = Client::factory()->create();
 
-        if ($roleCode === RoleCode::Employee) {
-            $user = User::factory()->employee()->create();
-        } elseif ($roleCode === RoleCode::User) {
-            $user = User::factory()->user()->create();
-        } else {
-            return;
-        }
+        $user = match($roleCode) {
+            RoleCode::Employee => User::factory()->employee()->create(),
+            RoleCode::User => User::factory()->user()->create(),
+            default => throw new LogicException('Unsupported role'),
+        };
 
         Sanctum::actingAs($user);
 
