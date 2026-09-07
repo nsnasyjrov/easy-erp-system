@@ -131,4 +131,15 @@ class ClientAuthorizationTest extends ClientTestCase
             ->assertJsonStructure(['data' => $this->expectedClientJsonStructure()]);
     }
 
+    public function test_user_cannot_view_private_client(): void
+    {
+        $user = User::factory()->user()->create();
+        Sanctum::actingAs($user);
+
+        $privateClient = Client::factory()->create();
+
+        $this->getJson(self::CLIENT_SHOW_URl . $privateClient->id)->assertForbidden()
+            ->assertJson(['message' => 'This action is unauthorized.']);
+    }
+
 }
