@@ -2,11 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ClientType;
 use App\Enums\RoleCode;
-use App\Models\Client;
 use App\Models\Role;
 use App\Models\User;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 abstract class ClientTestCase extends TestCase
@@ -60,5 +59,11 @@ abstract class ClientTestCase extends TestCase
         $user->refresh();
     }
 
-
+    public function createClientPayload(): array
+    {
+       return [
+            'name' => 'Stark Industries',
+            'type' => ClientType::Company
+        ];
+    }
 }

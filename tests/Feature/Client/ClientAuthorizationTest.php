@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Client;
 
+use App\Enums\ClientType;
 use App\Enums\RoleCode;
 use App\Models\Client;
 use App\Models\User;
@@ -18,11 +19,17 @@ class ClientAuthorizationTest extends ClientTestCase
 
     private const string CLIENTS_INDEX_URL = 'api/clients';
     private const string CLIENT_SHOW_URl = 'api/clients/';
+    private const string CLIENT_CREATE_URL = 'api/clients/';
 
     public static function canListOnlyPublic(): iterable
     {
         yield 'employee can see only public clients' => [RoleCode::Employee];
         yield 'user can see only public clients' => [RoleCode::User];
+    }
+
+    public function userIsClientResponsibleManager(User $user, CLient $client): bool
+    {
+        return $client->responsible_manager_id === $user->id;
     }
 
     public function test_admin_can_list_all_clients(): void
@@ -142,6 +149,43 @@ class ClientAuthorizationTest extends ClientTestCase
 
         $this->getJson(self::CLIENT_SHOW_URl . $privateClient->id)->assertForbidden()
             ->assertJson(['message' => 'This action is unauthorized.']);
+    }
+
+    /**
+     * create
+     * manager_can_create_client
+     * created_client_is_assigned_to_current_manager
+     * name_is_required
+     * type_is_required
+     * type_must_be_valid_enum
+     * name_must_not_exceed_150_chars
+     * appearance_date_must_be_date
+     * is_public_must_be_boolean
+     * response_has_expected_structure
+     * created_client_exists_in_database
+     */
+
+    public function test_admin_can_create_client(): void
+    {
+        $admin = User::factory()->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $this->postJson(self::CLIENT_CREATE_URL,  $this->createClientPayload())->assertCreated()
+        ->assertJsonStructure($this->expectedClientJsonStructureFull());
+
+    }
+
+    public function test_manager_can_create_client(): void
+    {
+        $manager = User::factory()->manager()->create();
+
+        Sanctum::actingAs($manager);
+
+        $response = $this->postJson(self::CLIENT_CREATE_URL, $this->createClientPayload())->assertCreated()
+            ->assertJsonStructure($this->expectedClientJsonStructureFull());
+
+        $client = Client::findOrFail($response->json('data.id'));
+        $this->assertTrue($this->userIsClientResponsibleManager($manager, $client));
     }
 
 }
