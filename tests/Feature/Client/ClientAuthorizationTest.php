@@ -30,10 +30,12 @@ class ClientAuthorizationTest extends ClientTestCase
         $admin = User::factory()->admin()->create();
         Sanctum::actingAs($admin);
         Client::factory()->count(10)->create();
+        /**
+         * Проверим
+         */
 
         $this->getJson(self::CLIENTS_INDEX_URL)->assertOk()->assertJsonStructure($this->clientsExpectedJsonStructure());
     }
-
 
     public function test_manager_can_list_only_own_clients(): void
     {
