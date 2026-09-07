@@ -67,7 +67,7 @@ class SetResponsibleManagerTest extends ClientTestCase
         $this->setRole($manager, RoleCode::Manager);
 
         $this->putJson($this->uriEndPoint($client->id), ['email' => $manager->email])->assertOk()->
-        assertJsonStructure($this->expectedClientJsonStructure());
+        assertJsonStructure($this->expectedClientJsonStructureFull());
 
         $this->assertDatabaseHas('clients', [
             'id' => $client->id,

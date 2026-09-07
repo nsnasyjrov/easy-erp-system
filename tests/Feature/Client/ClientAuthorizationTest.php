@@ -29,7 +29,7 @@ class ClientAuthorizationTest extends ClientTestCase
     {
         $admin = User::factory()->admin()->create();
         Sanctum::actingAs($admin);
-        Client::factory()->count(10);
+        Client::factory()->count(10)->create();
 
         $this->getJson(self::CLIENTS_INDEX_URL)->assertOk()->assertJsonStructure($this->clientsExpectedJsonStructure());
     }
@@ -85,10 +85,7 @@ class ClientAuthorizationTest extends ClientTestCase
 
         $client = Client::factory()->for($manager, 'responsibleManager')->create();
 
-        $anotherClient = Client::factory()->create();
-
-        $this->getJson(self::CLIENT_SHOW_URl . $client->id)->assertOk()->assertJsonStructure($this->expectedClientJsonStructure());
-        $this->getJson(self::CLIENT_SHOW_URl . $anotherClient->id)->assertForbidden()->assertJson(['message' => 'This action is unauthorized.']);
+        $this->getJson(self::CLIENT_SHOW_URl . $client->id)->assertOk()->assertJsonStructure($this->expectedClientJsonStructureFull());
     }
 
     public function test_manager_cannot_view_foreign_client(): void
@@ -109,7 +106,7 @@ class ClientAuthorizationTest extends ClientTestCase
         $publicClient = Client::factory()->create(['is_public' => true]);
 
         $this->getJson(self::CLIENT_SHOW_URl . $publicClient->id)->assertOk()
-            ->assertJsonStructure(['data' => $this->clientExpectedJsonStructure()]);
+            ->assertJsonStructure(['data' => $this->expectedClientJsonStructure()]);
     }
 
     public function test_employee_cannot_view_private_client(): void
@@ -131,7 +128,7 @@ class ClientAuthorizationTest extends ClientTestCase
         $publicClient = Client::factory()->create(['is_public' => true]);
 
         $this->getJson(self::CLIENT_SHOW_URl . $publicClient->id)->assertOk()
-            ->assertJsonStructure(['data' => $this->clientExpectedJsonStructure()]);
+            ->assertJsonStructure(['data' => $this->expectedClientJsonStructure()]);
     }
 
 }

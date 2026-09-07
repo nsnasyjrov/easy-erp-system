@@ -12,17 +12,23 @@ use Tests\TestCase;
 abstract class ClientTestCase extends TestCase
 {
 
-    public function expectedClientJsonStructure()
+    public function expectedClientJsonStructure(): array
     {
         return [
+            "id",
+            "type",
+            "appearance_date",
+            "created_at",
+            "updated_at",
+            "name",
+        ];
+    }
 
-            'data' => [
-                'id',
-                'type',
-                'appearance_date',
-                'created_at',
-                'updated_at',
-                'name',
+    public function expectedClientJsonStructureFull()
+    {
+        return [
+            'data' => [...
+                $this->expectedClientJsonStructure(),
                 'responsible_manager' => [
                     'id'   ,
                     'login',
@@ -37,23 +43,11 @@ abstract class ClientTestCase extends TestCase
         ];
     }
 
-    public function clientExpectedJsonStructure(): array
-    {
-        return [
-            "id",
-            "type",
-            "appearance_date",
-            "created_at",
-            "updated_at",
-            "name",
-        ];
-    }
-
     public function clientsExpectedJsonStructure(): array
     {
         return [
             'data' => [
-                '*' => $this->clientExpectedJsonStructure()
+                '*' => $this->expectedClientJsonStructure()
             ]
         ];
     }
