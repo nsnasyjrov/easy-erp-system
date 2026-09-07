@@ -17,6 +17,7 @@ class ClientAuthorizationTest extends ClientTestCase
     use RefreshDatabase;
 
     private const string CLIENTS_INDEX_URL = 'api/clients';
+    private const string CLIENT_SHOW_URl = 'api/clients/';
 
     public static function canListOnlyPublic(): iterable
     {
@@ -30,7 +31,7 @@ class ClientAuthorizationTest extends ClientTestCase
         Sanctum::actingAs($admin);
         Client::factory()->count(10);
 
-        $this->get(self::CLIENTS_INDEX_URL)->assertOk()->assertJsonStructure($this->clientsExpectedJsonStructure());
+        $this->getJson(self::CLIENTS_INDEX_URL)->assertOk()->assertJsonStructure($this->clientsExpectedJsonStructure());
     }
 
 
@@ -42,7 +43,7 @@ class ClientAuthorizationTest extends ClientTestCase
 
         Sanctum::actingAs($manager);
 
-        $response = $this->get(self::CLIENTS_INDEX_URL)->assertOk()->assertJsonCount(10, 'data')
+        $response = $this->getJson(self::CLIENTS_INDEX_URL)->assertOk()->assertJsonCount(10, 'data')
             ->assertJsonMissing(['id' => $exceptionClient->id]);
 
         foreach($ownClients as $client) {
@@ -66,7 +67,7 @@ class ClientAuthorizationTest extends ClientTestCase
 
         Sanctum::actingAs($user);
 
-        $response = $this->get(self::CLIENTS_INDEX_URL)->assertOk()->assertJsonCount(10, 'data')
+        $response = $this->getJson(self::CLIENTS_INDEX_URL)->assertOk()->assertJsonCount(10, 'data')
             ->assertJsonMissing(['id' => $exceptionClient->id]);
 
         foreach ($publicClients as $client) {
@@ -74,6 +75,63 @@ class ClientAuthorizationTest extends ClientTestCase
                 'id' => $client->id
             ]);
         }
+    }
+
+    public function test_manager_can_view_own_client(): void
+    {
+        $manager = User::factory()->manager()->create();
+
+        Sanctum::actingAs($manager);
+
+        $client = Client::factory()->for($manager, 'responsibleManager')->create();
+
+        $anotherClient = Client::factory()->create();
+
+        $this->getJson(self::CLIENT_SHOW_URl . $client->id)->assertOk()->assertJsonStructure($this->expectedClientJsonStructure());
+        $this->getJson(self::CLIENT_SHOW_URl . $anotherClient->id)->assertForbidden()->assertJson(['message' => 'This action is unauthorized.']);
+    }
+
+    public function test_manager_cannot_view_foreign_client(): void
+    {
+        $manager = User::factory()->manager()->create();
+
+        Sanctum::actingAs($manager);
+
+        $client = Client::factory()->create();
+        $this->getJson(self::CLIENT_SHOW_URl . $client->id)->assertForbidden()->assertJson(['message' => 'This action is unauthorized.']);
+    }
+
+    public function test_employee_can_view_public_client(): void
+    {
+        $employee = User::factory()->employee()->create();
+        Sanctum::actingAs($employee);
+
+        $publicClient = Client::factory()->create(['is_public' => true]);
+
+        $this->getJson(self::CLIENT_SHOW_URl . $publicClient->id)->assertOk()
+            ->assertJsonStructure(['data' => $this->clientExpectedJsonStructure()]);
+    }
+
+    public function test_employee_cannot_view_private_client(): void
+    {
+        $employee = User::factory()->employee()->create();
+        Sanctum::actingAs($employee);
+
+        $privateClient = Client::factory()->create();
+
+        $this->getJson(self::CLIENT_SHOW_URl . $privateClient->id)->assertForbidden()
+            ->assertJson(['message' => 'This action is unauthorized.']);
+    }
+
+    public function test_user_can_view_public_client(): void
+    {
+        $user = User::factory()->user()->create();
+        Sanctum::actingAs($user);
+
+        $publicClient = Client::factory()->create(['is_public' => true]);
+
+        $this->getJson(self::CLIENT_SHOW_URl . $publicClient->id)->assertOk()
+            ->assertJsonStructure(['data' => $this->clientExpectedJsonStructure()]);
     }
 
 }
