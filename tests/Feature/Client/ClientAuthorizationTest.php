@@ -153,8 +153,8 @@ class ClientAuthorizationTest extends ClientTestCase
 
     /**
      * create
-     * manager_can_create_client
-     * created_client_is_assigned_to_current_manager
+     * manager_can_create_client: DONE
+     * created_client_is_assigned_to_current_manager: DONE
      * name_is_required
      * type_is_required
      * type_must_be_valid_enum
@@ -186,6 +186,30 @@ class ClientAuthorizationTest extends ClientTestCase
 
         $client = Client::findOrFail($response->json('data.id'));
         $this->assertTrue($this->userIsClientResponsibleManager($manager, $client));
+    }
+
+    public function test_employee_cannot_create_client(): void
+    {
+        $employee = User::factory()->employee()->create();
+
+        Sanctum::actingAs($employee);
+
+        $this->postJson(self::CLIENT_CREATE_URL, $this->createClientPayload())
+            ->assertForbidden()->assertJson(['message' => 'This action is unauthorized.']);
+
+        $this->assertDatabaseCount('clients', 0);
+    }
+
+    public function test_user_cannot_create_client(): void
+    {
+        $user = User::factory()->user()->create();
+
+        Sanctum::actingAs($user);
+
+        $this->postJson(self::CLIENT_CREATE_URL, $this->createClientPayload())
+            ->assertForbidden()->assertJson(['message' => 'This action is unauthorized.']);
+
+        $this->assertDatabaseCount('clients', 0);
     }
 
 }
