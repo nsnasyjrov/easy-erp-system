@@ -104,7 +104,7 @@ class ClientAuthorizationTest extends ClientTestCase
 
         $client = Client::factory()->for($manager, 'responsibleManager')->create();
 
-        $this->getJson(self::CLIENT_SHOW_URL . $client->id)->assertOk()->assertJsonStructure($this->expectedClientJsonStructureFull());
+        $this->getJson(self::CLIENT_SHOW_URL . '/' . $client->id)->assertOk()->assertJsonStructure($this->expectedClientJsonStructureFull());
     }
 
     public function test_manager_cannot_view_foreign_client(): void
@@ -114,7 +114,7 @@ class ClientAuthorizationTest extends ClientTestCase
         Sanctum::actingAs($manager);
 
         $client = Client::factory()->create();
-        $this->getJson(self::CLIENT_SHOW_URL . $client->id)->assertForbidden()->assertJson(['message' => 'This action is unauthorized.']);
+        $this->getJson(self::CLIENT_SHOW_URL . '/' . $client->id)->assertForbidden()->assertJson(['message' => 'This action is unauthorized.']);
     }
 
     public function test_employee_can_view_public_client(): void
@@ -124,7 +124,7 @@ class ClientAuthorizationTest extends ClientTestCase
 
         $publicClient = Client::factory()->create(['is_public' => true]);
 
-        $this->getJson(self::CLIENT_SHOW_URL . $publicClient->id)->assertOk()
+        $this->getJson(self::CLIENT_SHOW_URL . '/' . $publicClient->id)->assertOk()
             ->assertJsonStructure(['data' => $this->expectedClientJsonStructure()]);
     }
 
@@ -135,7 +135,7 @@ class ClientAuthorizationTest extends ClientTestCase
 
         $privateClient = Client::factory()->create();
 
-        $this->getJson(self::CLIENT_SHOW_URL . $privateClient->id)->assertForbidden()
+        $this->getJson(self::CLIENT_SHOW_URL . '/' . $privateClient->id)->assertForbidden()
             ->assertJson(['message' => 'This action is unauthorized.']);
     }
 
@@ -146,7 +146,7 @@ class ClientAuthorizationTest extends ClientTestCase
 
         $publicClient = Client::factory()->create(['is_public' => true]);
 
-        $this->getJson(self::CLIENT_SHOW_URL . $publicClient->id)->assertOk()
+        $this->getJson(self::CLIENT_SHOW_URL . '/' . $publicClient->id)->assertOk()
             ->assertJsonStructure(['data' => $this->expectedClientJsonStructure()]);
     }
 
@@ -157,7 +157,7 @@ class ClientAuthorizationTest extends ClientTestCase
 
         $privateClient = Client::factory()->create();
 
-        $this->getJson(self::CLIENT_SHOW_URL . $privateClient->id)->assertForbidden()
+        $this->getJson(self::CLIENT_SHOW_URL . '/' . $privateClient->id)->assertForbidden()
             ->assertJson(['message' => 'This action is unauthorized.']);
     }
 
