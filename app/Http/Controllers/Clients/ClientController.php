@@ -25,7 +25,7 @@ class ClientController extends Controller
 
     public function index(IndexClientRequest $request): AnonymousResourceCollection
     {
-        $clients = $this->service->getPaginatedList($request->validated());
+        $clients = $this->service->getPaginatedList($request->user(), $request->validated());
 
         return (ClientResource::collection($clients));
     }
@@ -33,14 +33,13 @@ class ClientController extends Controller
     public function show(Client $client): ClientResource
     {
         $client->load('responsibleManager');
-        $client->load('contacts');
         return (new  ClientResource($client));
     }
 
     public function store(StoreClientRequest $request): JsonResponse
     {
-
             $validatedData = $request->validated();
+            $validatedData['responsible_manager'] = $request->user();
             $result = $this->service->create($validatedData);
 
             return (new ClientResource($result))

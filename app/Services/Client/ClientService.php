@@ -6,13 +6,21 @@ use App\Enums\RoleCode;
 use App\Models\Client;
 use App\Models\ContactInfo;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 
 class ClientService
 {
 
     public function create(array $clientData): Client
     {
-        return Client::create($clientData);
+        $manager = $clientData['responsible_manager'];
+        unset($clientData['responsible_manager']);
+
+        $client = Client::create($clientData);
+        $client->responsibleManager()->associate($manager);
+        $client->save();
+
+        return $client->refresh();
     }
 
 
@@ -49,11 +57,12 @@ class ClientService
         return $contact;
     }
 
-    public function getPaginatedList(array $filters)
+    public function getPaginatedList(User $user, array $filters)
     {
 
         $query = Client::query();
 
+        $this->applyAccessScope($query, $user);
         $this->applyQueryFilters($query, $filters);
 
         return $query->paginate($filters['per_page'] ?? 20);
@@ -137,14 +146,28 @@ class ClientService
             abort(409, 'The transmitted email must be different from the one in the table');
         }
 
-        if($user->role?->code !== RoleCode::Manager) {
-            abort(422, 'User is not a manager');
+        if(!in_array($user->role?->code, [RoleCode::Manager, RoleCode::Admin])) {
+            abort(422, 'User can\'t be set as responsible manager');
         }
 
         $client->responsibleManager()->associate($user);
         $client->save();
 
         return $client->refresh();
+    }
+
+    private function applyAccessScope(Builder $query, User $user): void
+    {
+        $roleCode = $user->role->code;
+
+        if($roleCode === RoleCode::Admin) return;
+
+        if($roleCode === RoleCode::Manager) {
+            $query->where('responsible_manager_id', $user->id);
+            return;
+        }
+
+        $query->where('is_public', True);
     }
 
 }

@@ -10,9 +10,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Tests\TestCase;
+use Tests\Feature\AuthTestCase;
 
-class ChangeEmailTest extends TestCase
+class ChangeEmailTest extends AuthTestCase
 {
     use RefreshDatabase;
 
@@ -33,7 +33,7 @@ class ChangeEmailTest extends TestCase
 
     private const CHANGE_EMAIL_ENDPOINT = 'api/auth/email';
 
-    public static function pendingEmailMustBeUniqueProvider(): iterable
+        public static function pendingEmailMustBeUniqueProvider(): iterable
     {
         yield 'The email has already been taken' => ['email'];
         yield 'The pending email has already been taken' => ['pending_email'];

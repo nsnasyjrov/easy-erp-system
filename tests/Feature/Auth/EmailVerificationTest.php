@@ -49,7 +49,7 @@ class EmailVerificationTest extends AuthTestCase
     {
         Notification::fake();
 
-        $user = User::factory()->verified()->create();
+        $user = User::factory()->create();
 
         Sanctum::actingAs($user);
 

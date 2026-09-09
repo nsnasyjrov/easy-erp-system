@@ -14,7 +14,6 @@ class StoreCompanyRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
-        //return auth()->check(); TODO: когда сделаешь норм. авторизацию снеси сверху и расскоментируй.
     }
 
     /**

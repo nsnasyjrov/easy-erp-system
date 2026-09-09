@@ -7,22 +7,19 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('clients')->group(functi
 
     Route::get('/', [ClientController::class, 'index']);
 
-// Create client entity
     Route::post('/', [ClientController::class, 'store']);
 
-// Read client entity
-    Route::get('{client}', [ClientController::class, 'show'])->whereNumber('client');
+    Route::get('{client}', [ClientController::class, 'show'])->whereNumber('client')->can('view', 'client');
 
-// Update client entity
     Route::patch('{client}', [ClientController::class, 'update'])->whereNumber('client');
 
-// Delete client entity
-    Route::delete('{client}', [ClientController::class, 'destroy'])->whereNumber('client');
+    Route::delete('{client}', [ClientController::class, 'destroy'])->whereNumber('client')->can('delete', 'client');
 
-//Get contacts
-    Route::get('{client}/contacts', [ClientController::class, 'contacts'])->whereNumber('client');
-// Add contact data
-    Route::post("{client}/contacts", [ClientController::class, 'ensureClientContacts'])->whereNumber('client');
+    Route::get('{client}/contacts', [ClientController::class, 'contacts'])
+        ->whereNumber('client')->can('viewContacts', 'client');
+
+    Route::post("{client}/contacts", [ClientController::class, 'ensureClientContacts'])
+        ->whereNumber('client')->can('createContact', 'client');
 
     Route::put('{client}/responsible_manager', [ClientController::class, 'setResponsibleManager'])
         ->whereNumber('client');
