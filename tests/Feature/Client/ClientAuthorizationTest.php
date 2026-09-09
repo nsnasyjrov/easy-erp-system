@@ -212,4 +212,25 @@ class ClientAuthorizationTest extends ClientTestCase
         $this->assertDatabaseCount('clients', 0);
     }
 
+    public function test_unauthenticated_user_cannot_create_client(): void
+    {
+        User::factory()->user()->create();
+
+        $this->postJson(self::CLIENT_CREATE_URL, $this->createClientPayload())
+            ->assertUnauthorized()->assertJson(['message' => 'Unauthenticated.']);
+
+        $this->assertDatabaseCount('clients', 0);
+    }
+
+    public function test_unverified_user_cannot_create_client(): void
+    {
+        $user = User::factory()->user()->unverified()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJson(self::CLIENT_CREATE_URL, $this->createClientPayload())
+            ->assertForbidden()->assertJson(['message' => 'Your email address is not verified.']);
+
+        $this->assertDatabaseCount('clients', 0);
+    }
+
 }
