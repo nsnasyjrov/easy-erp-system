@@ -27,6 +27,16 @@ class ClientAuthorizationTest extends ClientTestCase
         yield 'user can see only public clients' => [RoleCode::User];
     }
 
+    public static function fieldValidationProvider(): iterable
+    {
+        yield 'name field is required' => ['name', null];
+        yield 'type field is required' => ['type', null];
+        yield 'more then 151 characters in name field' => ['name', str_repeat('a', 151)];
+        yield 'type field is invalid' => ['type', 123];
+        yield 'appearance_date field is invalid' => ['appearance_date', 'not-a-date'];
+        yield 'is_public field is invalid' => ['is_public', 123];
+    }
+
     public function userIsClientResponsibleManager(User $user, CLient $client): bool
     {
         return $client->responsible_manager_id === $user->id;
@@ -233,4 +243,17 @@ class ClientAuthorizationTest extends ClientTestCase
         $this->assertDatabaseCount('clients', 0);
     }
 
+    #[DataProvider('fieldValidationProvider')]
+    public function test_client_creation_fields_are_validated(string $field, mixed $value): void
+    {
+
+        $manager = User::factory()->manager()->create();
+        Sanctum::actingAs($manager);
+
+        $payload = $this->createClientPayload();
+        $payload[$field] = $value;
+
+        $this->postJson(self::CLIENT_CREATE_URL, $payload)
+            ->assertUnprocessable()->assertJsonValidationErrors([$field]);
+    }
 }
